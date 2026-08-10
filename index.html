@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Golfe Ponta do Pargo — Madeira</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Space+Grotesk:wght@400;500&display=swap');
+
+  :root {
+    --basalt: #16221f;
+    --basalt-deep: #0c1412;
+    --fairway: #4a7c59;
+    --fairway-light: #7ba888;
+    --cliff-clay: #c17a4f;
+    --mist: #eef1ea;
+    --mist-dim: #c7cec3;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--basalt);
+    color: var(--mist);
+    font-family: 'Space Grotesk', sans-serif;
+    overflow-x: hidden;
+  }
+
+  .display {
+    font-family: 'Fraunces', serif;
+    font-optical-sizing: auto;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .hero-bg svg { width: 100%; height: 100%; display: block; }
+
+  .nav {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem clamp(1.5rem, 5vw, 4rem) 0;
+  }
+
+  .wordmark {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 1.05rem;
+    letter-spacing: 0.02em;
+    color: var(--mist);
+  }
+
+  .wordmark span { color: var(--cliff-clay); }
+
+  .tag {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--mist-dim);
+    border: 1px solid rgba(238,241,234,0.25);
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 0 clamp(1.5rem, 5vw, 4rem) clamp(3rem, 8vh, 6rem);
+    max-width: 900px;
+  }
+
+  .eyebrow {
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--fairway-light);
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .eyebrow::before {
+    content: '';
+    width: 28px;
+    height: 1px;
+    background: var(--fairway-light);
+  }
+
+  h1 {
+    font-size: clamp(2.6rem, 6.5vw, 5.2rem);
+    font-weight: 500;
+    line-height: 1.02;
+    letter-spacing: -0.01em;
+    color: var(--mist);
+  }
+
+  h1 em {
+    font-style: italic;
+    font-weight: 300;
+    color: var(--cliff-clay);
+  }
+
+  .lede {
+    margin-top: 1.6rem;
+    font-size: clamp(1rem, 1.6vw, 1.2rem);
+    line-height: 1.6;
+    color: var(--mist-dim);
+    max-width: 46ch;
+  }
+
+  /* ---------- CONTACT STRIP ---------- */
+  .contact-strip {
+    position: relative;
+    z-index: 5;
+    background: var(--mist);
+    color: var(--basalt-deep);
+    padding: clamp(2.5rem, 6vh, 4rem) clamp(1.5rem, 5vw, 4rem);
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  .contact-left .label {
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--fairway);
+    margin-bottom: 0.8rem;
+  }
+
+  .contact-left h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: clamp(1.7rem, 3vw, 2.4rem);
+    line-height: 1.15;
+    color: var(--basalt-deep);
+  }
+
+  .contact-right {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .email-card {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    background: var(--basalt);
+    color: var(--mist);
+    padding: 1.1rem 1.5rem;
+    border-radius: 10px;
+    text-decoration: none;
+    width: 100%;
+    transition: transform 0.25s ease, background 0.25s ease;
+    font-size: clamp(0.95rem, 1.6vw, 1.15rem);
+  }
+
+  .email-card:hover {
+    transform: translateY(-2px);
+    background: var(--basalt-deep);
+  }
+
+  .email-card svg { flex-shrink: 0; }
+
+  .email-card .addr { font-weight: 500; word-break: break-all; }
+
+  .copy-hint {
+    font-size: 0.78rem;
+    color: #5a6b60;
+  }
+
+  .domains-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 0.4rem;
+  }
+
+  .domain-chip {
+    font-size: 0.75rem;
+    letter-spacing: 0.02em;
+    padding: 0.35rem 0.8rem;
+    border: 1px solid rgba(22,34,31,0.18);
+    border-radius: 999px;
+    color: #4a5c50;
+  }
+
+  /* ---------- FOOTER STATS ---------- */
+  .footer {
+    background: var(--basalt-deep);
+    padding: clamp(2rem, 5vh, 3rem) clamp(1.5rem, 5vw, 4rem);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+
+  .footer-note {
+    font-size: 0.82rem;
+    color: var(--mist-dim);
+    max-width: 40ch;
+    line-height: 1.5;
+  }
+
+  .footer-loc {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--fairway-light);
+  }
+
+  @media (max-width: 780px) {
+    .contact-strip { grid-template-columns: 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-bg">
+    <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#1c2b28"/>
+          <stop offset="55%" stop-color="#16221f"/>
+          <stop offset="100%" stop-color="#0c1412"/>
+        </linearGradient>
+        <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#2c4b45"/>
+          <stop offset="100%" stop-color="#0c1412"/>
+        </linearGradient>
+        <linearGradient id="cliffGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#2a3a30"/>
+          <stop offset="100%" stop-color="#0c1412"/>
+        </linearGradient>
+        <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#c17a4f" stop-opacity="0.55"/>
+          <stop offset="100%" stop-color="#c17a4f" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+
+      <rect width="1600" height="1000" fill="url(#sky)"/>
+      <circle cx="1180" cy="330" r="260" fill="url(#sunGlow)"/>
+      <circle cx="1180" cy="330" r="70" fill="#e8b088" opacity="0.85"/>
+
+      <!-- ocean horizon -->
+      <rect y="560" width="1600" height="440" fill="url(#sea)"/>
+      <g opacity="0.18" stroke="#eef1ea" stroke-width="1.5">
+        <path d="M0 600 Q 200 590 400 602 T 800 598 T 1200 604 T 1600 596"/>
+        <path d="M0 650 Q 220 640 420 652 T 820 648 T 1220 654 T 1600 646"/>
+        <path d="M0 710 Q 240 698 440 712 T 840 706 T 1240 714 T 1600 704"/>
+      </g>
+
+      <!-- basalt cliff silhouette, Ponta do Pargo style -->
+      <path d="M0 1000 L0 720 Q 90 650 180 690 Q 260 720 340 640 Q 420 570 520 630 Q 610 680 700 600 Q 790 530 900 610 Q 1000 680 1120 650 Q 1230 625 1320 700 Q 1420 770 1600 730 L1600 1000 Z"
+            fill="url(#cliffGrad)"/>
+
+      <!-- fairway contour lines on cliff top -->
+      <g opacity="0.5" stroke="#7ba888" stroke-width="2" fill="none">
+        <path d="M40 700 Q 160 660 300 685"/>
+        <path d="M420 610 Q 540 570 660 600"/>
+        <path d="M780 600 Q 900 570 1020 615"/>
+      </g>
+
+      <!-- lighthouse nod to Ponta do Pargo -->
+      <g transform="translate(1360,540)">
+        <rect x="-8" y="-140" width="16" height="140" fill="#eef1ea" opacity="0.9"/>
+        <rect x="-12" y="-150" width="24" height="14" fill="#c17a4f"/>
+        <rect x="-10" y="-108" width="20" height="10" fill="#16221f" opacity="0.6"/>
+        <rect x="-10" y="-70" width="20" height="10" fill="#16221f" opacity="0.6"/>
+      </g>
+
+      <!-- flag on green, small signature mark -->
+      <g transform="translate(230,660)">
+        <ellipse cx="0" cy="14" rx="46" ry="12" fill="#4a7c59" opacity="0.55"/>
+        <line x1="0" y1="14" x2="0" y2="-58" stroke="#eef1ea" stroke-width="2.5"/>
+        <path d="M0 -58 L34 -46 L0 -34 Z" fill="#c17a4f"/>
+      </g>
+    </svg>
+  </div>
+
+  <nav class="nav">
+    <div class="wordmark">Golfe <span>Ponta do Pargo</span></div>
+    <div class="tag">Calheta · Madeira</div>
+  </nav>
+
+  <div class="hero-content">
+    <div class="eyebrow">Novo campo de golfe · costa oeste da Madeira</div>
+    <h1 class="display">Onde o basalto<br>encontra a <em>fairway</em>.</h1>
+    <p class="lede">
+      Um novo campo de golfe está a nascer nos penhascos da Ponta do Pargo, no concelho da Calheta.
+      Esta página reúne os domínios reservados para o projeto e o contacto direto para parcerias,
+      patrocínios e informação.
+    </p>
+  </div>
+</section>
+
+<section class="contact-strip" id="contacto">
+  <div class="contact-left">
+    <div class="label">Contacto</div>
+    <h2 class="display">Interessado em parcerias, patrocínio ou mais informação sobre o projeto?</h2>
+  </div>
+  <div class="contact-right">
+    <a class="email-card" href="mailto:pontadopargogolfmadeira@gmail.com">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7ba888" stroke-width="1.8">
+        <rect x="2" y="4" width="20" height="16" rx="2"/>
+        <path d="M2 6l10 7 10-7"/>
+      </svg>
+      <span class="addr">pontadopargogolfmadeira@gmail.com</span>
+    </a>
+    <div class="copy-hint">Respostas geralmente dentro de 2 a 3 dias úteis.</div>
+    <div class="domains-row">
+      <span class="domain-chip">pontadopargogolf.com</span>
+      <span class="domain-chip">pontadopargogolfe.com</span>
+      <span class="domain-chip">pontadopargogolfcourse.com</span>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <p class="footer-note">Página informativa independente sobre o projeto do campo de golfe na Ponta do Pargo, concelho da Calheta, ilha da Madeira.</p>
+  <div class="footer-loc">Ponta do Pargo, Madeira</div>
+</footer>
+
+</body>
+</html>
