@@ -8,346 +8,215 @@
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Space+Grotesk:wght@400;500&display=swap');
 
   :root {
-    --basalt: #16221f;
-    --basalt-deep: #0c1412;
-    --fairway: #4a7c59;
-    --fairway-light: #7ba888;
-    --cliff-clay: #c17a4f;
+    --sky-top: #6fb3d9;
+    --sky-mid: #a7d4e8;
+    --sky-horizon: #eaf3ef;
+    --sea: #3d7a92;
+    --sea-deep: #1f4f63;
+    --cliff: #4a5c50;
+    --cliff-dark: #2c3a32;
+    --clay: #c17a4f;
+    --ink-deep: #0c1412;
     --mist: #eef1ea;
-    --mist-dim: #c7cec3;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  html { scroll-behavior: smooth; }
-
   body {
-    background: var(--basalt);
+    background: var(--sea-deep);
     color: var(--mist);
     font-family: 'Space Grotesk', sans-serif;
     overflow-x: hidden;
   }
 
-  .display {
-    font-family: 'Fraunces', serif;
-    font-optical-sizing: auto;
-  }
+  .display { font-family: 'Fraunces', serif; font-optical-sizing: auto; }
 
-  /* ---------- HERO ---------- */
-  .hero {
+  .stage {
     position: relative;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-end;
+    background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 45%, var(--sky-horizon) 62%, var(--sea) 62%, var(--sea-deep) 100%);
     overflow: hidden;
   }
 
-  .hero-bg {
+  .scene-svg {
     position: absolute;
     inset: 0;
-    z-index: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
   }
 
-  .hero-bg svg { width: 100%; height: 100%; display: block; }
-
-  .nav {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 2rem clamp(1.5rem, 5vw, 4rem) 0;
-  }
-
-  .wordmark {
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
-    font-size: 1.05rem;
-    letter-spacing: 0.02em;
-    color: var(--mist);
-  }
-
-  .wordmark span { color: var(--cliff-clay); }
-
-  .tag {
-    font-size: 0.7rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--mist-dim);
-    border: 1px solid rgba(238,241,234,0.25);
-    padding: 0.4rem 0.9rem;
-    border-radius: 999px;
-  }
-
-  .hero-content {
-    position: relative;
-    z-index: 2;
-    padding: 0 clamp(1.5rem, 5vw, 4rem) clamp(3rem, 8vh, 6rem);
-    max-width: 900px;
-  }
-
-  .eyebrow {
-    font-size: 0.78rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--fairway-light);
-    margin-bottom: 1.2rem;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-  }
-
-  .eyebrow::before {
-    content: '';
-    width: 28px;
-    height: 1px;
-    background: var(--fairway-light);
-  }
-
-  h1 {
-    font-size: clamp(2.6rem, 6.5vw, 5.2rem);
-    font-weight: 500;
-    line-height: 1.02;
-    letter-spacing: -0.01em;
-    color: var(--mist);
-  }
-
-  h1 em {
-    font-style: italic;
-    font-weight: 300;
-    color: var(--cliff-clay);
-  }
-
-  .lede {
-    margin-top: 1.6rem;
-    font-size: clamp(1rem, 1.6vw, 1.2rem);
-    line-height: 1.6;
-    color: var(--mist-dim);
-    max-width: 46ch;
-  }
-
-  /* ---------- CONTACT STRIP ---------- */
-  .contact-strip {
+  .content {
     position: relative;
     z-index: 5;
-    background: var(--mist);
-    color: var(--basalt-deep);
-    padding: clamp(2.5rem, 6vh, 4rem) clamp(1.5rem, 5vw, 4rem);
-    display: grid;
-    grid-template-columns: 1.1fr 1fr;
-    gap: 3rem;
-    align-items: center;
-  }
-
-  .contact-left .label {
-    font-size: 0.72rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--fairway);
-    margin-bottom: 0.8rem;
-  }
-
-  .contact-left h2 {
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
-    font-size: clamp(1.7rem, 3vw, 2.4rem);
-    line-height: 1.15;
-    color: var(--basalt-deep);
-  }
-
-  .contact-right {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    align-items: flex-start;
-  }
-
-  .email-card {
-    display: flex;
     align-items: center;
-    gap: 0.9rem;
-    background: var(--basalt);
-    color: var(--mist);
-    padding: 1.1rem 1.5rem;
-    border-radius: 10px;
+    justify-content: center;
+    min-height: 100vh;
+    text-align: center;
+    padding: 1.5rem;
+    gap: 0.6rem;
+  }
+
+  .contact-line {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: clamp(1.05rem, 2.4vw, 1.5rem);
+    color: var(--ink-deep);
+    line-height: 1.4;
+  }
+
+  .contact-line a {
+    color: var(--clay);
     text-decoration: none;
-    width: 100%;
-    transition: transform 0.25s ease, background 0.25s ease;
-    font-size: clamp(0.95rem, 1.6vw, 1.15rem);
+    font-weight: 600;
+  }
+  .contact-line a:hover { text-decoration: underline; }
+
+  .contact-line.en {
+    font-size: clamp(0.85rem, 1.7vw, 1.05rem);
+    font-weight: 400;
+    opacity: 0.75;
   }
 
-  .email-card:hover {
-    transform: translateY(-2px);
-    background: var(--basalt-deep);
+  .contact-line.email-line {
+    margin-top: 0.3rem;
+    font-size: clamp(0.95rem, 2vw, 1.2rem);
+    font-weight: 600;
+  }
+  .contact-line.email-line a { color: var(--clay); }
+
+  .contact-card {
+    background: rgba(238,241,234,0.85);
+    padding: 1.3rem 2rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(12,20,18,0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
   }
 
-  .email-card svg { flex-shrink: 0; }
-
-  .email-card .addr { font-weight: 500; word-break: break-all; }
-
-  .copy-hint {
-    font-size: 0.78rem;
-    color: #5a6b60;
-  }
-
-  .domains-row {
+  .domains-footer {
+    position: absolute;
+    bottom: clamp(1.2rem, 4vh, 2.2rem);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
     display: flex;
     flex-wrap: wrap;
-    gap: 0.6rem;
-    margin-top: 0.4rem;
+    justify-content: center;
+    gap: 0.5rem;
   }
 
   .domain-chip {
-    font-size: 0.75rem;
-    letter-spacing: 0.02em;
+    font-size: clamp(0.68rem, 1.3vw, 0.78rem);
+    letter-spacing: 0.01em;
     padding: 0.35rem 0.8rem;
-    border: 1px solid rgba(22,34,31,0.18);
+    background: rgba(238,241,234,0.7);
     border-radius: 999px;
-    color: #4a5c50;
+    color: var(--ink-deep);
   }
 
-  /* ---------- FOOTER STATS ---------- */
-  .footer {
-    background: var(--basalt-deep);
-    padding: clamp(2rem, 5vh, 3rem) clamp(1.5rem, 5vw, 4rem);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-  }
-
-  .footer-note {
-    font-size: 0.82rem;
-    color: var(--mist-dim);
-    max-width: 40ch;
-    line-height: 1.5;
-  }
-
-  .footer-loc {
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-size: 0.95rem;
-    color: var(--fairway-light);
-  }
-
-  @media (max-width: 780px) {
-    .contact-strip { grid-template-columns: 1fr; }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    html { scroll-behavior: auto; }
+  @media (max-width: 640px) {
+    .contact-card { padding: 1.1rem 1.5rem; }
   }
 </style>
 </head>
 <body>
 
-<section class="hero">
-  <div class="hero-bg">
-    <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#1c2b28"/>
-          <stop offset="55%" stop-color="#16221f"/>
-          <stop offset="100%" stop-color="#0c1412"/>
-        </linearGradient>
-        <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#2c4b45"/>
-          <stop offset="100%" stop-color="#0c1412"/>
-        </linearGradient>
-        <linearGradient id="cliffGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#2a3a30"/>
-          <stop offset="100%" stop-color="#0c1412"/>
-        </linearGradient>
-        <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#c17a4f" stop-opacity="0.55"/>
-          <stop offset="100%" stop-color="#c17a4f" stop-opacity="0"/>
-        </radialGradient>
-      </defs>
+<div class="stage">
 
-      <rect width="1600" height="1000" fill="url(#sky)"/>
-      <circle cx="1180" cy="330" r="260" fill="url(#sunGlow)"/>
-      <circle cx="1180" cy="330" r="70" fill="#e8b088" opacity="0.85"/>
+  <svg class="scene-svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#fff4d6" stop-opacity="0.9"/>
+        <stop offset="45%" stop-color="#ffe9b0" stop-opacity="0.35"/>
+        <stop offset="100%" stop-color="#ffe9b0" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="cliffGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#5c6f61"/>
+        <stop offset="100%" stop-color="#28352d"/>
+      </linearGradient>
+      <linearGradient id="seaGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3d7a92"/>
+        <stop offset="100%" stop-color="#1f4f63"/>
+      </linearGradient>
+    </defs>
 
-      <!-- ocean horizon -->
-      <rect y="560" width="1600" height="440" fill="url(#sea)"/>
-      <g opacity="0.18" stroke="#eef1ea" stroke-width="1.5">
-        <path d="M0 600 Q 200 590 400 602 T 800 598 T 1200 604 T 1600 596"/>
-        <path d="M0 650 Q 220 640 420 652 T 820 648 T 1220 654 T 1600 646"/>
-        <path d="M0 710 Q 240 698 440 712 T 840 706 T 1240 714 T 1600 704"/>
-      </g>
+    <!-- sun -->
+    <circle cx="1220" cy="150" r="160" fill="url(#sunGlow)"/>
+    <circle cx="1220" cy="150" r="46" fill="#fff8e7"/>
 
-      <!-- basalt cliff silhouette, Ponta do Pargo style -->
-      <path d="M0 1000 L0 720 Q 90 650 180 690 Q 260 720 340 640 Q 420 570 520 630 Q 610 680 700 600 Q 790 530 900 610 Q 1000 680 1120 650 Q 1230 625 1320 700 Q 1420 770 1600 730 L1600 1000 Z"
-            fill="url(#cliffGrad)"/>
+    <!-- sea -->
+    <rect y="558" width="1600" height="342" fill="url(#seaGrad)"/>
+    <g opacity="0.15" stroke="#eef1ea" stroke-width="2" fill="none">
+      <path d="M0 600 Q 200 590 400 602 T 800 598 T 1200 604 T 1600 596"/>
+      <path d="M0 660 Q 220 650 420 662 T 820 658 T 1220 664 T 1600 656"/>
+      <path d="M0 730 Q 240 718 440 732 T 840 726 T 1240 734 T 1600 724"/>
+    </g>
 
-      <!-- fairway contour lines on cliff top -->
-      <g opacity="0.5" stroke="#7ba888" stroke-width="2" fill="none">
-        <path d="M40 700 Q 160 660 300 685"/>
-        <path d="M420 610 Q 540 570 660 600"/>
-        <path d="M780 600 Q 900 570 1020 615"/>
-      </g>
+    <!-- rocky point / cliff jutting from the left, with lighthouse -->
+    <path d="M0 900 L0 560
+             C 60 540, 110 555, 150 540
+             C 190 525, 210 495, 260 480
+             C 310 465, 345 480, 380 465
+             C 410 452, 415 430, 440 420
+             C 460 412, 475 418, 480 430
+             C 486 445, 470 460, 450 470
+             C 500 468, 540 490, 560 520
+             C 575 542, 570 560, 555 575
+             C 600 590, 620 615, 610 640
+             L0 640 Z"
+          fill="url(#cliffGrad)" stroke="#1a2521" stroke-width="1.5"/>
 
-      <!-- lighthouse nod to Ponta do Pargo -->
-      <g transform="translate(1360,540)">
-        <rect x="-8" y="-140" width="16" height="140" fill="#eef1ea" opacity="0.9"/>
-        <rect x="-12" y="-150" width="24" height="14" fill="#c17a4f"/>
-        <rect x="-10" y="-108" width="20" height="10" fill="#16221f" opacity="0.6"/>
-        <rect x="-10" y="-70" width="20" height="10" fill="#16221f" opacity="0.6"/>
-      </g>
+    <!-- lighthouse on the point -->
+    <g transform="translate(438, 420)">
+      <!-- rock base under lighthouse -->
+      <ellipse cx="0" cy="18" rx="34" ry="10" fill="#28352d"/>
+      <!-- tower -->
+      <rect x="-13" y="-95" width="26" height="115" fill="#eef1ea"/>
+      <rect x="-13" y="-95" width="26" height="22" fill="#c17a4f"/>
+      <rect x="-13" y="-55" width="26" height="10" fill="#28352d" opacity="0.55"/>
+      <rect x="-13" y="-25" width="26" height="10" fill="#28352d" opacity="0.55"/>
+      <!-- lantern room -->
+      <rect x="-16" y="-112" width="32" height="17" rx="2" fill="#28352d"/>
+      <circle cx="0" cy="-103" r="5" fill="#fff4d6"/>
+      <!-- roof -->
+      <path d="M-18 -112 L0 -128 L18 -112 Z" fill="#8a3f2a"/>
+      <!-- light beam -->
+      <path d="M0 -103 L120 -140 L120 -66 Z" fill="#fff4d6" opacity="0.18"/>
+    </g>
 
-      <!-- flag on green, small signature mark -->
-      <g transform="translate(230,660)">
-        <ellipse cx="0" cy="14" rx="46" ry="12" fill="#4a7c59" opacity="0.55"/>
-        <line x1="0" y1="14" x2="0" y2="-58" stroke="#eef1ea" stroke-width="2.5"/>
-        <path d="M0 -58 L34 -46 L0 -34 Z" fill="#c17a4f"/>
-      </g>
-    </svg>
-  </div>
+    <!-- gentle grass/scrub texture on cliff top -->
+    <g opacity="0.3" stroke="#7a8f7c" stroke-width="2">
+      <line x1="80" y1="548" x2="82" y2="536"/>
+      <line x1="95" y1="546" x2="98" y2="533"/>
+      <line x1="200" y1="500" x2="203" y2="488"/>
+      <line x1="215" y1="498" x2="217" y2="486"/>
+      <line x1="330" y1="475" x2="332" y2="463"/>
+    </g>
+  </svg>
 
-  <nav class="nav">
-    <div class="wordmark">Golfe <span>Ponta do Pargo</span></div>
-    <div class="tag">Calheta · Madeira</div>
-  </nav>
-
-  <div class="hero-content">
-    <div class="eyebrow">Novo campo de golfe · costa oeste da Madeira</div>
-    <h1 class="display">Onde o basalto<br>encontra a <em>fairway</em>.</h1>
-    <p class="lede">
-      Um novo campo de golfe está a nascer nos penhascos da Ponta do Pargo, no concelho da Calheta.
-      Esta página reúne os domínios reservados para o projeto e o contacto direto para parcerias,
-      patrocínios e informação.
-    </p>
-  </div>
-</section>
-
-<section class="contact-strip" id="contacto">
-  <div class="contact-left">
-    <div class="label">Contacto</div>
-    <h2 class="display">Interessado em parcerias, patrocínio ou mais informação sobre o projeto?</h2>
-  </div>
-  <div class="contact-right">
-    <a class="email-card" href="mailto:pontadopargogolfmadeira@gmail.com">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7ba888" stroke-width="1.8">
-        <rect x="2" y="4" width="20" height="16" rx="2"/>
-        <path d="M2 6l10 7 10-7"/>
-      </svg>
-      <span class="addr">pontadopargogolfmadeira@gmail.com</span>
-    </a>
-    <div class="copy-hint">Respostas geralmente dentro de 2 a 3 dias úteis.</div>
-    <div class="domains-row">
-      <span class="domain-chip">pontadopargogolf.com</span>
-      <span class="domain-chip">pontadopargogolfe.com</span>
-      <span class="domain-chip">pontadopargogolfcourse.com</span>
+  <div class="content">
+    <div class="contact-card">
+      <p class="contact-line">Caso tenha interesse contacte-me.</p>
+      <p class="contact-line en">If you're interested, please get in touch with me.</p>
+      <p class="contact-line email-line"><a href="mailto:pontadopargogolfmadeira@gmail.com">pontadopargogolfmadeira@gmail.com</a></p>
     </div>
   </div>
-</section>
 
-<footer class="footer">
-  <p class="footer-note">Página informativa independente sobre o projeto do campo de golfe na Ponta do Pargo, concelho da Calheta, ilha da Madeira.</p>
-  <div class="footer-loc">Ponta do Pargo, Madeira</div>
-</footer>
+  <div class="domains-footer">
+    <span class="domain-chip">pontadopargogolf.com</span>
+    <span class="domain-chip">pontadopargogolfe.com</span>
+    <span class="domain-chip">pontadopargogolfcourse.com</span>
+  </div>
+
+</div>
 
 </body>
 </html>
