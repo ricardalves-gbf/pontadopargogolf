@@ -1,222 +1,1237 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Golfe Ponta do Pargo — Madeira</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ponta do Pargo Golf · Domínios à venda</title>
+<meta name="description" content="pontadopargogolf.com, pontadopargogolfcourse.com e pontadopargogolfe.com estão à venda. Acerte no buraco e acenda o farol da Ponta do Pargo.">
+<meta property="og:title" content="Ponta do Pargo Golf">
+<meta property="og:description" content="Três domínios à venda. Acerte no buraco e acenda o farol.">
+<meta name="theme-color" content="#0e4a66">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛳</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Space+Grotesk:wght@400;500&display=swap');
-
   :root {
-    --sky-top: #6fb3d9;
-    --sky-mid: #a7d4e8;
-    --sky-horizon: #eaf3ef;
-    --sea: #3d7a92;
-    --sea-deep: #1f4f63;
-    --cliff: #4a5c50;
-    --cliff-dark: #2c3a32;
-    --clay: #c17a4f;
-    --ink-deep: #0c1412;
-    --mist: #eef1ea;
+    --sea: #0e4a66;
+    --panel: rgba(36, 29, 25, 0.8);
+    --ink: #fbf8f2;
+    --ink-soft: rgba(251, 248, 242, 0.72);
+    --lamp: #ffd36e;
+    --flag: #d1352b;
+    --night: #0c1f33;
+    --font: 'Bricolage Grotesque', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--sea-deep);
-    color: var(--mist);
-    font-family: 'Space Grotesk', sans-serif;
-    overflow-x: hidden;
-  }
-
-  .display { font-family: 'Fraunces', serif; font-optical-sizing: auto; }
-
-  .stage {
-    position: relative;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 45%, var(--sky-horizon) 62%, var(--sea) 62%, var(--sea-deep) 100%);
+  * { box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    margin: 0;
+    background: var(--sea);
     overflow: hidden;
+    font-family: var(--font);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
   }
-
-  .scene-svg {
-    position: absolute;
+  canvas {
+    position: fixed;
     inset: 0;
     width: 100%;
     height: 100%;
     display: block;
+    touch-action: none;
+    cursor: crosshair;
   }
-
-  .content {
-    position: relative;
-    z-index: 5;
+  .hud {
+    position: fixed;
+    left: 0;
+    right: 0;
     display: flex;
+    gap: 10px;
+    padding: 12px 14px;
+    pointer-events: none;
+  }
+  .hud-top {
+    top: 0;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-top: calc(12px + env(safe-area-inset-top, 0px));
+  }
+  .hud-bottom {
+    bottom: 0;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    text-align: center;
-    padding: 1.5rem;
-    gap: 0.6rem;
+    padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
   }
-
-  .contact-line {
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
-    font-size: clamp(1.05rem, 2.4vw, 1.5rem);
-    color: var(--ink-deep);
+  .panel {
+    pointer-events: auto;
+    background: var(--panel);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    border-radius: 14px;
+    padding: 9px 14px;
+  }
+  .brand {
+    font-weight: 800;
+    font-size: 1.12rem;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+  }
+  .status {
+    font-size: 0.86rem;
+    color: var(--ink-soft);
+    margin-top: 3px;
+  }
+  .status b { color: var(--ink); font-weight: 600; }
+  .right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+  }
+  .lang {
+    display: flex;
+    padding: 4px;
+    gap: 2px;
+  }
+  .lang button {
+    font: 600 0.82rem var(--font);
+    color: var(--ink-soft);
+    background: none;
+    border: 0;
+    border-radius: 9px;
+    padding: 5px 9px;
+    cursor: pointer;
+  }
+  .lang button[aria-pressed="true"] {
+    background: var(--ink);
+    color: #241d19;
+  }
+  .wind {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.86rem;
+    font-weight: 600;
+  }
+  .wind svg { width: 22px; height: 22px; transition: transform 0.5s ease; }
+  .wind[hidden] { display: none; }
+  .hint {
+    max-width: 36ch;
+    text-align: center;
+    font-size: 0.95rem;
     line-height: 1.4;
   }
-
-  .contact-line a {
-    color: var(--clay);
-    text-decoration: none;
-    font-weight: 600;
+  .skip {
+    pointer-events: auto;
+    margin-top: 8px;
+    font: 400 0.86rem var(--font);
+    color: var(--ink);
+    background: none;
+    border: 0;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: rgba(251, 248, 242, 0.5);
+    cursor: pointer;
+    padding: 6px;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
   }
-  .contact-line a:hover { text-decoration: underline; }
-
-  .contact-line.en {
-    font-size: clamp(0.85rem, 1.7vw, 1.05rem);
-    font-weight: 400;
-    opacity: 0.75;
-  }
-
-  .contact-line.email-line {
-    margin-top: 0.3rem;
-    font-size: clamp(0.95rem, 2vw, 1.2rem);
-    font-weight: 600;
-  }
-  .contact-line.email-line a { color: var(--clay); }
-
-  .contact-card {
-    background: rgba(238,241,234,0.85);
-    padding: 1.3rem 2rem;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(12,20,18,0.2);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.4rem;
-  }
-
-  .domains-footer {
-    position: absolute;
-    bottom: clamp(1.2rem, 4vh, 2.2rem);
+  .toast {
+    position: fixed;
     left: 50%;
-    transform: translateX(-50%);
-    z-index: 5;
+    top: 22%;
+    transform: translate(-50%, -8px);
+    max-width: min(88vw, 380px);
+    text-align: center;
+    font-size: 1rem;
+    line-height: 1.4;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  .toast-sub { margin-top: 8px; font-size: 0.86rem; color: var(--ink-soft); }
+
+  .overlay {
+    position: fixed;
+    inset: 0;
     display: flex;
-    flex-wrap: wrap;
+    align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    padding: 16px;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    background: rgba(5, 12, 22, 0.25);
+    opacity: 0;
+    transition: opacity 0.6s ease;
   }
-
-  .domain-chip {
-    font-size: clamp(0.68rem, 1.3vw, 0.78rem);
-    letter-spacing: 0.01em;
-    padding: 0.35rem 0.8rem;
-    background: rgba(238,241,234,0.7);
+  .overlay[hidden] { display: none; }
+  .overlay.show { opacity: 1; }
+  .card {
+    width: 100%;
+    max-width: 420px;
+    background: rgba(12, 31, 51, 0.94);
+    border: 1px solid rgba(255, 211, 110, 0.35);
+    border-radius: 22px;
+    padding: 26px 24px 20px;
+    box-shadow: 0 0 80px rgba(255, 211, 110, 0.18);
+    transform: translateY(14px);
+    transition: transform 0.6s ease;
+  }
+  .overlay.show .card { transform: none; }
+  .score {
+    margin: 0 0 4px;
+    font-size: 0.95rem;
+    color: var(--lamp);
+    font-weight: 600;
+  }
+  .card h2 {
+    margin: 0 0 14px;
+    font-size: 2rem;
+    line-height: 1.05;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  .card p { margin: 0 0 12px; line-height: 1.45; color: var(--ink-soft); }
+  .domains {
+    list-style: none;
+    margin: 0 0 14px;
+    padding: 0;
+  }
+  .domains li {
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(251, 248, 242, 0.12);
+    font-size: 1rem;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+    overflow-wrap: anywhere;
+  }
+  .domains li:first-child { font-size: 1.15rem; font-weight: 800; color: var(--lamp); }
+  .tag {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--night);
+    background: var(--lamp);
     border-radius: 999px;
-    color: var(--ink-deep);
+    padding: 2px 8px;
   }
-
-  @media (max-width: 640px) {
-    .contact-card { padding: 1.1rem 1.5rem; }
+  .btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    font: 600 1rem var(--font);
+    border-radius: 12px;
+    padding: 13px 16px;
+    cursor: pointer;
+    text-decoration: none;
+    border: 0;
+  }
+  .btn-primary { background: var(--lamp); color: var(--night); }
+  .btn-primary:hover { filter: brightness(1.06); }
+  .small { font-size: 0.88rem; margin-top: 10px; text-align: center; }
+  .small a { color: var(--ink); overflow-wrap: anywhere; }
+  .btn-ghost {
+    background: none;
+    color: var(--ink-soft);
+    border: 1px solid rgba(251, 248, 242, 0.2);
+    margin-top: 8px;
+  }
+  button:focus-visible, a:focus-visible {
+    outline: 3px solid var(--lamp);
+    outline-offset: 2px;
+  }
+  body.ended .hud-bottom { visibility: hidden; }
+  @media (max-width: 420px) {
+    .overlay { align-items: flex-end; }
+    .card h2 { font-size: 1.7rem; }
   }
 </style>
 </head>
 <body>
+<canvas id="game" aria-label="Mini-golfe na Ponta do Pargo"></canvas>
 
-<div class="stage">
-
-  <svg class="scene-svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#fff4d6" stop-opacity="0.9"/>
-        <stop offset="45%" stop-color="#ffe9b0" stop-opacity="0.35"/>
-        <stop offset="100%" stop-color="#ffe9b0" stop-opacity="0"/>
-      </radialGradient>
-      <linearGradient id="cliffGrad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#5c6f61"/>
-        <stop offset="100%" stop-color="#28352d"/>
-      </linearGradient>
-      <linearGradient id="seaGrad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#3d7a92"/>
-        <stop offset="100%" stop-color="#1f4f63"/>
-      </linearGradient>
-    </defs>
-
-    <!-- sun -->
-    <circle cx="1220" cy="150" r="160" fill="url(#sunGlow)"/>
-    <circle cx="1220" cy="150" r="46" fill="#fff8e7"/>
-
-    <!-- sea -->
-    <rect y="558" width="1600" height="342" fill="url(#seaGrad)"/>
-    <g opacity="0.15" stroke="#eef1ea" stroke-width="2" fill="none">
-      <path d="M0 600 Q 200 590 400 602 T 800 598 T 1200 604 T 1600 596"/>
-      <path d="M0 660 Q 220 650 420 662 T 820 658 T 1220 664 T 1600 656"/>
-      <path d="M0 730 Q 240 718 440 732 T 840 726 T 1240 734 T 1600 724"/>
-    </g>
-
-    <!-- rocky point / cliff jutting from the left, with lighthouse -->
-    <path d="M0 900 L0 560
-             C 60 540, 110 555, 150 540
-             C 190 525, 210 495, 260 480
-             C 310 465, 345 480, 380 465
-             C 410 452, 415 430, 440 420
-             C 460 412, 475 418, 480 430
-             C 486 445, 470 460, 450 470
-             C 500 468, 540 490, 560 520
-             C 575 542, 570 560, 555 575
-             C 600 590, 620 615, 610 640
-             L0 640 Z"
-          fill="url(#cliffGrad)" stroke="#1a2521" stroke-width="1.5"/>
-
-    <!-- lighthouse on the point -->
-    <g transform="translate(438, 420)">
-      <!-- rock base under lighthouse -->
-      <ellipse cx="0" cy="18" rx="34" ry="10" fill="#28352d"/>
-      <!-- tower -->
-      <rect x="-13" y="-95" width="26" height="115" fill="#eef1ea"/>
-      <rect x="-13" y="-95" width="26" height="22" fill="#c17a4f"/>
-      <rect x="-13" y="-55" width="26" height="10" fill="#28352d" opacity="0.55"/>
-      <rect x="-13" y="-25" width="26" height="10" fill="#28352d" opacity="0.55"/>
-      <!-- lantern room -->
-      <rect x="-16" y="-112" width="32" height="17" rx="2" fill="#28352d"/>
-      <circle cx="0" cy="-103" r="5" fill="#fff4d6"/>
-      <!-- roof -->
-      <path d="M-18 -112 L0 -128 L18 -112 Z" fill="#8a3f2a"/>
-      <!-- light beam -->
-      <path d="M0 -103 L120 -140 L120 -66 Z" fill="#fff4d6" opacity="0.18"/>
-    </g>
-
-    <!-- gentle grass/scrub texture on cliff top -->
-    <g opacity="0.3" stroke="#7a8f7c" stroke-width="2">
-      <line x1="80" y1="548" x2="82" y2="536"/>
-      <line x1="95" y1="546" x2="98" y2="533"/>
-      <line x1="200" y1="500" x2="203" y2="488"/>
-      <line x1="215" y1="498" x2="217" y2="486"/>
-      <line x1="330" y1="475" x2="332" y2="463"/>
-    </g>
-  </svg>
-
-  <div class="content">
-    <div class="contact-card">
-      <p class="contact-line">Caso tenha interesse nestes domínios contacte-me.</p>
-      <p class="contact-line en">If you are interested in these domains, please contact me.</p>
-      <p class="contact-line email-line"><a href="mailto:pontadopargogolfmadeira@gmail.com">pontadopargogolfmadeira@gmail.com</a></p>
+<div class="hud hud-top">
+  <div class="panel">
+    <div class="brand">Ponta do Pargo Golf</div>
+    <div class="status"><b id="strokes"></b> <span id="parLabel"></span></div>
+  </div>
+  <div class="right">
+    <div class="panel lang" role="group" aria-label="Idioma / Language">
+      <button type="button" data-lang="pt">PT</button>
+      <button type="button" data-lang="en">EN</button>
+    </div>
+    <div class="panel wind" id="wind">
+      <svg id="windArrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h15m-5-5 5 5-5 5" fill="none" stroke="#fbf8f2" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span id="windText"></span>
     </div>
   </div>
-
-  <div class="domains-footer">
-    <span class="domain-chip">pontadopargogolf.com</span>
-    <span class="domain-chip">pontadopargogolfe.com</span>
-    <span class="domain-chip">pontadopargogolfcourse.com</span>
-  </div>
-
 </div>
 
+<div class="toast panel" id="toast" role="status" aria-live="polite"></div>
+
+<div class="hud hud-bottom">
+  <div class="panel hint" id="hint"></div>
+  <button type="button" class="skip" id="skipBtn"></button>
+</div>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="cardTitle">
+    <p class="score" id="cardScore"></p>
+    <h2 id="cardTitle"></h2>
+    <p id="cardForSale"></p>
+    <ul class="domains">
+      <li>pontadopargogolf.com <span class="tag" id="mainTag"></span></li>
+      <li>pontadopargogolfcourse.com</li>
+      <li>pontadopargogolfe.com</li>
+    </ul>
+    <p id="cardOffers"></p>
+    <a class="btn btn-primary" id="mailBtn" href="#"></a>
+    <p class="small"><span id="orWrite"></span> <a id="mailText" href="#"></a></p>
+    <button type="button" class="btn btn-ghost" id="cardAction"></button>
+  </div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  /* ---------- Textos PT / EN ---------- */
+  const T = {
+    pt: {
+      strokes: n => 'Tacadas: ' + n,
+      par: 'Par 3',
+      hintDrive: 'Arraste para trás e solte para dar a tacada. Ponha a bola no green, mas cuidado com o vento.',
+      hintPutt: 'No green não há vento. Arraste para trás e solte para meter a bola no buraco.',
+      wind: k => 'Vento ' + k + ' km/h',
+      noWind: 'Sem vento',
+      splashes: [
+        'Splash! A bola foi dar de comer aos peixes.',
+        'Os pargos da Ponta do Pargo agradecem a bola nova.',
+        'Os golfinhos vão jogar com essa bola esta tarde.',
+        'Mais uma bola para a coleção do fundo do mar.',
+        'Um cagarro viu tudo, mas não vai contar a ninguém.',
+        'Essa bola vai chegar aos Açores daqui a três semanas.',
+        'O Atlântico agradece a contribuição.',
+        'Os peixes já estão a pedir mais.'
+      ],
+      penalty: 'Mais uma tacada de penalidade.',
+      houseHits: [
+        'Toc toc! O faroleiro diz que não encomendou bolas de golfe.',
+        'Cuidado com as janelas! O faroleiro ainda está a pagar a última.',
+        'A bola foi visitar o faroleiro. Ele devolveu-a.'
+      ],
+      lighthouseHits: [
+        'Bong! O farol aguenta tempestades do Atlântico. Uma bola de golfe não o assusta.',
+        'O farol serve para guiar os barcos, não as bolas!',
+        'Acertou no farol! Ainda está apagado, mas já acordou.'
+      ],
+      onGreen: 'Está no green! Agora é meter no buraco.',
+      lip: 'Quase! A bola deu a volta ao buraco.',
+      help: 'O vento acalmou e o buraco cresceu um bocadinho. Força!',
+      skip: 'Ver os domínios à venda sem jogar',
+      winTitle: 'O farol acendeu-se!',
+      skipTitle: 'Domínios à venda',
+      forSale: 'Estes três domínios estão à venda, em conjunto:',
+      offers: 'Aceitam-se propostas.',
+      mainTag: 'principal',
+      send: 'Enviar proposta por email',
+      orWrite: 'Ou escreva para',
+      replay: 'Jogar outra vez',
+      back: 'Voltar ao jogo',
+      score: (name, n) => n === 1 ? name + '!' : name + ' com ' + n + ' tacadas',
+      names: ['Hole in One', 'Birdie', 'Par', 'Bogey', 'Double Bogey', 'O farol perdoa tudo'],
+      subject: 'Proposta pelos domínios Ponta do Pargo Golf',
+      body: 'Olá,\n\nGostaria de apresentar uma proposta pelos domínios pontadopargogolf.com, pontadopargogolfcourse.com e pontadopargogolfe.com.\n\nValor da proposta:\nNome:\nContacto:\n'
+    },
+    en: {
+      strokes: n => 'Strokes: ' + n,
+      par: 'Par 3',
+      hintDrive: 'Drag back and release to take your shot. Land the ball on the green, but mind the wind.',
+      hintPutt: 'No wind on the green. Drag back and release to sink the putt.',
+      wind: k => 'Wind ' + k + ' km/h',
+      noWind: 'No wind',
+      splashes: [
+        'Splash! Your ball went to feed the fish.',
+        'The sea bream of Ponta do Pargo thank you for the new ball.',
+        'The dolphins will be playing with that ball this afternoon.',
+        'One more ball for the seabed collection.',
+        'A shearwater saw everything, but it won’t tell anyone.',
+        'That ball will reach the Azores in about three weeks.',
+        'The Atlantic thanks you for your contribution.',
+        'The fish are already asking for more.'
+      ],
+      penalty: 'That’s one penalty stroke.',
+      houseHits: [
+        'Knock knock! The lighthouse keeper says he didn’t order any golf balls.',
+        'Mind the windows! The keeper is still paying for the last one.',
+        'The ball went to visit the lighthouse keeper. He sent it back.'
+      ],
+      lighthouseHits: [
+        'Bong! This lighthouse survives Atlantic storms. A golf ball won’t scare it.',
+        'The lighthouse guides ships, not golf balls!',
+        'You hit the lighthouse! It’s still dark, but now it’s awake.'
+      ],
+      onGreen: 'You’re on the green! Now sink it.',
+      lip: 'So close! The ball lipped out.',
+      help: 'The wind has dropped and the hole got a little bigger. Go for it!',
+      skip: 'See the domains for sale without playing',
+      winTitle: 'The lighthouse is lit!',
+      skipTitle: 'Domains for sale',
+      forSale: 'These three domains are for sale as a bundle:',
+      offers: 'Offers welcome.',
+      mainTag: 'main',
+      send: 'Send an offer by email',
+      orWrite: 'Or write to',
+      replay: 'Play again',
+      back: 'Back to the game',
+      score: (name, n) => n === 1 ? name + '!' : name + ' in ' + n + ' strokes',
+      names: ['Hole in One', 'Birdie', 'Par', 'Bogey', 'Double Bogey', 'The lighthouse forgives everything'],
+      subject: 'Offer for the Ponta do Pargo Golf domains',
+      body: 'Hello,\n\nI would like to make an offer for the domains pontadopargogolf.com, pontadopargogolfcourse.com and pontadopargogolfe.com.\n\nOffer amount:\nName:\nContact:\n'
+    }
+  };
+  let lang = (navigator.language || 'pt').toLowerCase().startsWith('pt') ? 'pt' : 'en';
+  const t = () => T[lang];
+
+  /* ---------- Mundo (unidades lógicas) ---------- */
+  const LAND = [[140,1700],[860,1700],[905,1200],[875,1030],[790,950],[650,905],[605,820],[655,720],[785,680],[865,560],[855,380],[805,185],[700,105],[520,85],[340,115],[200,200],[148,360],[200,520],[262,600],[150,640],[88,760],[108,900],[168,1000],[118,1150],[98,1300]];
+  const FAIRWAY = [[445,1185],[560,1185],[585,1000],[565,830],[545,630],[565,470],[335,470],[355,630],[375,830],[405,1000]];
+  const GREEN = { x: 450, y: 320, rx: 150, ry: 105 };
+  const FRINGE_K = 1.15;
+  const HOLE = { x: 410, y: 298 };
+  const TEE = { x: 500, y: 1250 };
+  const LH = { x: 705, y: 225 };
+  const LAMP = { x: LH.x, y: LH.y - 105 };
+  const HOUSE = { x1: 610, y1: 196, x2: 670, y2: 242 };
+  const TOWER = { x: LH.x, y: LH.y - 6, r: 21 };
+
+  const VIEW_ALL = { x: 40, y: 50, w: 920, h: 1350 };
+  const VIEW_PUTT = { x: 255, y: 90, w: 500, h: 400 };
+
+  const DECEL = { green: 170, fringe: 420, fairway: 380, rough: 950 };
+  const MAX_CARRY = 1050, WIND_MAX = 150, MAX_PUTT = 430, CAPTURE = 235;
+
+  function smoothPath(pts) {
+    const p = new Path2D(), n = pts.length;
+    const mid = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+    const s = mid(pts[n - 1], pts[0]);
+    p.moveTo(s[0], s[1]);
+    for (let i = 0; i < n; i++) {
+      const c = pts[i], m = mid(c, pts[(i + 1) % n]);
+      p.quadraticCurveTo(c[0], c[1], m[0], m[1]);
+    }
+    p.closePath();
+    return p;
+  }
+  function ellipsePath(e, k) {
+    const p = new Path2D();
+    p.ellipse(e.x, e.y, e.rx * k, e.ry * k, 0, 0, Math.PI * 2);
+    return p;
+  }
+  const landPath = smoothPath(LAND);
+  const fairwayPath = smoothPath(FAIRWAY);
+  const greenPath = ellipsePath(GREEN, 1);
+  const fringePath = ellipsePath(GREEN, FRINGE_K);
+  const hitCtx = document.createElement('canvas').getContext('2d');
+
+  function surface(x, y) {
+    if (!hitCtx.isPointInPath(landPath, x, y)) return 'sea';
+    const dx = (x - GREEN.x) / GREEN.rx, dy = (y - GREEN.y) / GREEN.ry, e = dx * dx + dy * dy;
+    if (e <= 1) return 'green';
+    if (e <= FRINGE_K * FRINGE_K) return 'fringe';
+    if (hitCtx.isPointInPath(fairwayPath, x, y)) return 'fairway';
+    return 'rough';
+  }
+
+  /* Detalhes decorativos fixos */
+  let seed = 7;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const waves = Array.from({ length: 90 }, () => ({ x: -800 + rnd() * 2600, y: -600 + rnd() * 2600, len: 30 + rnd() * 50, ph: rnd() * 6.28 }));
+  const tufts = [];
+  while (tufts.length < 170) {
+    const x = 60 + rnd() * 880, y = 80 + rnd() * 1350;
+    const s = surface(x, y);
+    if (s === 'rough') tufts.push({ x, y, r: 3 + rnd() * 4 });
+  }
+  const rocks = [[925,1110,16],[938,1140,9],[700,960,12],[565,850,8],[60,820,14],[45,850,8],[255,640,10],[880,470,13],[600,60,11],[130,250,12]];
+
+  /* ---------- Canvas e câmara ---------- */
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+  let cw = 0, ch = 0, dpr = 1;
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cw = window.innerWidth; ch = window.innerHeight;
+    canvas.width = Math.round(cw * dpr); canvas.height = Math.round(ch * dpr);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const cam = { ...VIEW_ALL };
+  let camTarget = VIEW_ALL;
+  function view() {
+    const padT = 78, padB = 110;
+    const ah = Math.max(100, ch - padT - padB);
+    const sc = Math.min(cw / cam.w, ah / cam.h);
+    return { sc, ox: (cw - cam.w * sc) / 2 - cam.x * sc, oy: padT + (ah - cam.h * sc) / 2 - cam.y * sc };
+  }
+
+  /* ---------- Estado do jogo ---------- */
+  const RM = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ball = { x: TEE.x, y: TEE.y, z: 0, lipped: false, scale: 1 };
+  let last = { x: TEE.x, y: TEE.y };
+  let vel = { x: 0, y: 0 };
+  let strokes = 0, splashes = 0, help = false, holeR = 10;
+  let wind = { a: 0, s: 0 };
+  let state = 'ready';     // ready, aiming, flying, rolling, splash, sinking, won, card
+  let mode = 'drive';      // drive ou putt
+  let flight = null, aim = null, sinkT = 0;
+  let night = 0, beamAng = -0.6;
+  let fx = [];
+  let time = 0;
+  let lastSplashMsg = -1, bumpedThisShot = false;
+  const lastHit = { house: -1, tower: -1 };
+
+  function newWind() {
+    wind = help ? { a: 0, s: 0 } : { a: rnd() * Math.PI * 2, s: 0.25 + rnd() * 0.75 };
+    updateHUD();
+  }
+
+  /* ---------- Interface ---------- */
+  const $ = id => document.getElementById(id);
+  let toastTimer = 0;
+  function toast(msg, ms = 2800, sub) {
+    const el = $('toast');
+    el.textContent = '';
+    const main = document.createElement('div');
+    main.textContent = msg;
+    el.appendChild(main);
+    if (sub) {
+      const extra = document.createElement('div');
+      extra.className = 'toast-sub';
+      extra.textContent = sub;
+      el.appendChild(extra);
+    }
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), ms);
+  }
+  function updateHUD() {
+    $('strokes').textContent = t().strokes(strokes);
+    $('parLabel').textContent = t().par;
+    $('hint').textContent = mode === 'putt' ? t().hintPutt : t().hintDrive;
+    const w = $('wind');
+    w.hidden = mode === 'putt';
+    $('windText').textContent = wind.s > 0 ? t().wind(Math.round(wind.s * 28)) : t().noWind;
+    $('windArrow').style.transform = 'rotate(' + (wind.a * 180 / Math.PI) + 'deg)';
+    $('windArrow').style.opacity = wind.s > 0 ? 1 : 0.3;
+    $('skipBtn').textContent = t().skip;
+  }
+  function applyLang() {
+    document.documentElement.lang = lang;
+    document.querySelectorAll('.lang button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
+    updateHUD();
+    if (!$('overlay').hidden) fillCard();
+  }
+  document.querySelectorAll('.lang button').forEach(b => b.addEventListener('click', () => { lang = b.dataset.lang; applyLang(); }));
+
+  const EMAIL = ['pontadopargogolfmadeira', 'gmail.com'].join('@');
+  let cardWon = false;
+  function scoreName(n) {
+    return t().names[Math.min(Math.max(n, 1), 6) - 1];
+  }
+  function fillCard() {
+    const tt = t();
+    $('cardScore').textContent = cardWon ? tt.score(scoreName(strokes), strokes) : '';
+    $('cardScore').hidden = !cardWon;
+    $('cardTitle').textContent = cardWon ? tt.winTitle : tt.skipTitle;
+    $('cardForSale').textContent = tt.forSale;
+    $('mainTag').textContent = tt.mainTag;
+    $('cardOffers').textContent = tt.offers;
+    const href = 'mailto:' + EMAIL + '?subject=' + encodeURIComponent(tt.subject) + '&body=' + encodeURIComponent(tt.body);
+    $('mailBtn').textContent = tt.send;
+    $('mailBtn').href = href;
+    $('orWrite').textContent = tt.orWrite;
+    $('mailText').textContent = EMAIL;
+    $('mailText').href = href;
+    $('cardAction').textContent = cardWon ? tt.replay : tt.back;
+  }
+  let prevState = 'ready';
+  function openCard(won) {
+    cardWon = won;
+    fillCard();
+    if (!won) prevState = state;
+    state = 'card';
+    document.body.classList.add('ended');
+    const o = $('overlay');
+    o.hidden = false;
+    requestAnimationFrame(() => o.classList.add('show'));
+    setTimeout(() => $('mailBtn').focus({ preventScroll: true }), 50);
+  }
+  function closeCard() {
+    const o = $('overlay');
+    o.classList.remove('show');
+    setTimeout(() => { o.hidden = true; }, 300);
+    document.body.classList.remove('ended');
+    if (cardWon) resetGame();
+    else state = prevState === 'aiming' ? 'ready' : prevState;
+  }
+  $('skipBtn').addEventListener('click', () => { if (state !== 'card') openCard(false); });
+  $('cardAction').addEventListener('click', closeCard);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && state === 'card') closeCard(); });
+
+  function resetGame() {
+    Object.assign(ball, { x: TEE.x, y: TEE.y, z: 0, lipped: false, scale: 1 });
+    last = { x: TEE.x, y: TEE.y };
+    vel = { x: 0, y: 0 };
+    strokes = 0; splashes = 0; help = false; holeR = 10;
+    mode = 'drive'; state = 'ready'; night = 0; fx = [];
+    camTarget = VIEW_ALL;
+    newWind();
+    updateHUD();
+  }
+
+  /* ---------- Entrada (rato / toque) ---------- */
+  const maxDrag = () => Math.max(110, Math.min(190, Math.min(cw, ch) * 0.34));
+  canvas.addEventListener('pointerdown', e => {
+    if (state !== 'ready') return;
+    canvas.setPointerCapture(e.pointerId);
+    aim = { sx: e.clientX, sy: e.clientY, cx: e.clientX, cy: e.clientY };
+    state = 'aiming';
+  });
+  canvas.addEventListener('pointermove', e => {
+    if (state === 'aiming' && aim) { aim.cx = e.clientX; aim.cy = e.clientY; }
+  });
+  function aimInfo() {
+    const dx = aim.sx - aim.cx, dy = aim.sy - aim.cy, len = Math.hypot(dx, dy);
+    if (len < 1) return null;
+    return { x: dx / len, y: dy / len, p: Math.min(len / maxDrag(), 1) };
+  }
+  canvas.addEventListener('pointerup', () => {
+    if (state !== 'aiming') return;
+    const a = aim ? aimInfo() : null;
+    aim = null;
+    if (!a || a.p < 0.06) { state = 'ready'; return; }
+    shoot(a);
+  });
+  canvas.addEventListener('pointercancel', () => { if (state === 'aiming') { aim = null; state = 'ready'; } });
+
+  function shoot(a) {
+    strokes++;
+    last = { x: ball.x, y: ball.y };
+    ball.lipped = false;
+    bumpedThisShot = false;
+    if (mode === 'drive') {
+      const carry = a.p * MAX_CARRY;
+      const drift = wind.s * WIND_MAX * (carry / MAX_CARRY);
+      flight = {
+        sx: ball.x, sy: ball.y,
+        ex: ball.x + a.x * carry + Math.cos(wind.a) * drift,
+        ey: ball.y + a.y * carry + Math.sin(wind.a) * drift,
+        dx: a.x, dy: a.y, carry, t: 0,
+        dur: 0.6 + 0.9 * a.p, peak: 30 + 130 * a.p
+      };
+      state = 'flying';
+    } else {
+      vel = { x: a.x * a.p * MAX_PUTT, y: a.y * a.p * MAX_PUTT };
+      state = 'rolling';
+    }
+    updateHUD();
+  }
+
+  function splash(x, y) {
+    state = 'splash';
+    fx.push({ x, y, t: 0 });
+    ball.z = 0;
+    strokes++;
+    splashes++;
+    const list = t().splashes;
+    let i = 0;
+    if (splashes > 1) {
+      do { i = 1 + Math.floor(rnd() * (list.length - 1)); } while (i === lastSplashMsg && list.length > 2);
+    }
+    lastSplashMsg = i;
+    toast(list[i], 3400, t().penalty);
+    updateHUD();
+    setTimeout(() => {
+      Object.assign(ball, { x: last.x, y: last.y, z: 0 });
+      vel = { x: 0, y: 0 };
+      settle(true);
+    }, 1400);
+  }
+
+  function checkHelp() {
+    if (!help && (splashes >= 3 || strokes >= 9)) {
+      help = true;
+      holeR = 17;
+      wind = { a: 0, s: 0 };
+      setTimeout(() => toast(t().help, 3400), 900);
+    }
+  }
+
+  function settle(fromSplash) {
+    const s = surface(ball.x, ball.y);
+    const prevMode = mode;
+    mode = (s === 'green' || s === 'fringe') ? 'putt' : 'drive';
+    last = { x: ball.x, y: ball.y };
+    checkHelp();
+    if (mode === 'drive') newWind();
+    if (mode === 'putt' && prevMode !== 'putt' && !fromSplash) toast(t().onGreen, 2200);
+    camTarget = mode === 'putt' ? VIEW_PUTT : VIEW_ALL;
+    state = 'ready';
+    updateHUD();
+  }
+
+  function sink() {
+    state = 'sinking';
+    sinkT = 0;
+    vel = { x: 0, y: 0 };
+  }
+
+  function win() {
+    state = 'won';
+    camTarget = VIEW_ALL;
+    document.body.classList.add('ended');
+    setTimeout(() => openCard(true), 1900);
+  }
+
+  /* ---------- Física ---------- */
+  function obstacleAt(x, y) {
+    if (x > HOUSE.x1 && x < HOUSE.x2 && y > HOUSE.y1 && y < HOUSE.y2) return 'house';
+    if (Math.hypot(x - TOWER.x, y - TOWER.y) < TOWER.r) return 'tower';
+    return null;
+  }
+  function hitMessage(kind) {
+    if (bumpedThisShot) return;
+    bumpedThisShot = true;
+    const list = kind === 'house' ? t().houseHits : t().lighthouseHits;
+    let i;
+    do { i = Math.floor(rnd() * list.length); } while (i === lastHit[kind] && list.length > 1);
+    lastHit[kind] = i;
+    toast(list[i], 3200);
+  }
+  function bounce(kind, px, py) {
+    let nx, ny;
+    if (kind === 'tower') { nx = px - TOWER.x; ny = py - TOWER.y; }
+    else if (px <= HOUSE.x1) { nx = -1; ny = 0; }
+    else if (px >= HOUSE.x2) { nx = 1; ny = 0; }
+    else if (py <= HOUSE.y1) { nx = 0; ny = -1; }
+    else { nx = 0; ny = 1; }
+    const d = Math.hypot(nx, ny) || 1;
+    nx /= d; ny /= d;
+    const dot = vel.x * nx + vel.y * ny;
+    if (dot < 0) {
+      vel.x = (vel.x - 2 * dot * nx) * 0.6;
+      vel.y = (vel.y - 2 * dot * ny) * 0.6;
+    }
+    ball.x = px; ball.y = py;
+    hitMessage(kind);
+  }
+
+  function roll(dt) {
+    let sp = Math.hypot(vel.x, vel.y);
+    const steps = Math.ceil(sp * dt / 2) + 1;
+    const h = dt / steps;
+    for (let i = 0; i < steps; i++) {
+      const s = surface(ball.x, ball.y);
+      if (s === 'sea') { splash(ball.x, ball.y); return; }
+      sp = Math.hypot(vel.x, vel.y);
+      const hx = HOLE.x - ball.x, hy = HOLE.y - ball.y, d = Math.hypot(hx, hy);
+      if (d < holeR) {
+        if (sp < CAPTURE) { sink(); return; }
+        if (!ball.lipped) {
+          ball.lipped = true;
+          const ang = (rnd() - 0.5) * 0.7, c = Math.cos(ang), sn = Math.sin(ang);
+          vel = { x: (vel.x * c - vel.y * sn) * 0.8, y: (vel.x * sn + vel.y * c) * 0.8 };
+          toast(t().lip, 1800);
+        }
+      } else if (d > holeR * 1.6) {
+        ball.lipped = false;
+      }
+      if (d < holeR * 2.2 && sp < CAPTURE * 0.7 && d > 0.01) {
+        vel.x += hx / d * 60 * h;
+        vel.y += hy / d * 60 * h;
+      }
+      const dec = DECEL[s] * h;
+      sp = Math.hypot(vel.x, vel.y);
+      if (sp <= dec) { vel = { x: 0, y: 0 }; break; }
+      vel.x -= vel.x / sp * dec;
+      vel.y -= vel.y / sp * dec;
+      const nx = ball.x + vel.x * h, ny = ball.y + vel.y * h;
+      const ob = obstacleAt(nx, ny);
+      if (ob) { bounce(ob, ball.x, ball.y); continue; }
+      ball.x = nx;
+      ball.y = ny;
+    }
+    if (vel.x === 0 && vel.y === 0) settle(false);
+  }
+
+  function update(dt) {
+    time += dt;
+    // câmara
+    const k = Math.min(1, dt * 3.5);
+    cam.x += (camTarget.x - cam.x) * k;
+    cam.y += (camTarget.y - cam.y) * k;
+    cam.w += (camTarget.w - cam.w) * k;
+    cam.h += (camTarget.h - cam.h) * k;
+
+    if (state === 'flying') {
+      flight.t += dt;
+      const p = Math.min(flight.t / flight.dur, 1);
+      ball.x = flight.sx + (flight.ex - flight.sx) * p;
+      ball.y = flight.sy + (flight.ey - flight.sy) * p;
+      ball.z = Math.sin(Math.PI * p) * flight.peak;
+      const ob = p > 0.5 ? obstacleAt(ball.x, ball.y) : null;
+      if (ob && (ob === 'tower' || ball.z < 50)) {
+        ball.z = 0;
+        for (let i = 0; i < 60 && obstacleAt(ball.x, ball.y); i++) { ball.x -= flight.dx * 2; ball.y -= flight.dy * 2; }
+        vel = { x: -flight.dx * 150 + (rnd() - 0.5) * 60, y: -flight.dy * 150 + (rnd() - 0.5) * 60 };
+        hitMessage(ob);
+        state = 'rolling';
+        return;
+      }
+      if (p >= 1) {
+        ball.z = 0;
+        if (surface(ball.x, ball.y) === 'sea') splash(ball.x, ball.y);
+        else if (Math.hypot(ball.x - HOLE.x, ball.y - HOLE.y) < holeR + 3) sink();
+        else {
+          vel = { x: flight.dx * flight.carry * 0.16, y: flight.dy * flight.carry * 0.16 };
+          state = 'rolling';
+        }
+      }
+    } else if (state === 'rolling') {
+      roll(dt);
+    } else if (state === 'sinking') {
+      sinkT += dt / 0.4;
+      ball.x += (HOLE.x - ball.x) * Math.min(1, dt * 12);
+      ball.y += (HOLE.y - ball.y) * Math.min(1, dt * 12);
+      ball.scale = Math.max(0, 1 - sinkT);
+      if (sinkT >= 1) win();
+    }
+
+    if (state === 'won' || (state === 'card' && cardWon)) night = Math.min(1, night + dt / 1.6);
+    if (night > 0) beamAng += dt * (RM ? 0.35 : 1.1);
+    fx.forEach(f => { f.t += dt / 1.2; });
+    fx = fx.filter(f => f.t < 1);
+    updateLife(dt);
+  }
+
+
+  /* ---------- Vida marinha (baleia e golfinhos) ---------- */
+  let life = [], nextLife = 7;
+  function visibleRect() {
+    const v = view();
+    return { x0: (20 - v.ox) / v.sc, x1: (cw - 20 - v.ox) / v.sc, y0: (95 - v.oy) / v.sc, y1: (ch - 140 - v.oy) / v.sc };
+  }
+  function clearSea(x, y, r) {
+    if (surface(x, y) !== 'sea') return false;
+    for (let k = 0; k < 8; k++) {
+      const a = k * Math.PI / 4;
+      if (surface(x + Math.cos(a) * r, y + Math.sin(a) * r) !== 'sea') return false;
+    }
+    return true;
+  }
+  function spawnLife() {
+    const R = visibleRect();
+    if (R.x1 - R.x0 < 50 || R.y1 - R.y0 < 50) return;
+    const whale = rnd() < 0.4;
+    for (let tries = 0; tries < 40; tries++) {
+      const x = R.x0 + rnd() * (R.x1 - R.x0), y = R.y0 + rnd() * (R.y1 - R.y0);
+      const a = rnd() * Math.PI * 2;
+      if (whale) {
+        if (clearSea(x, y, 85)) { life.push({ type: 'whale', x, y, a, t: 0, dur: 7 }); return; }
+      } else {
+        let ok = true;
+        for (let d = 0; d <= 360; d += 60) {
+          if (!clearSea(x + Math.cos(a) * d, y + Math.sin(a) * d, 35)) { ok = false; break; }
+        }
+        if (ok) { life.push({ type: 'dolphins', x, y, a, t: 0, dur: 4.4, n: rnd() < 0.5 ? 3 : 2 }); return; }
+      }
+    }
+  }
+  function updateLife(dt) {
+    if (!RM && life.length === 0 && time > nextLife) {
+      spawnLife();
+      nextLife = time + 14 + rnd() * 14;
+    }
+    life.forEach(l => { l.t += dt; });
+    life = life.filter(l => l.t < l.dur);
+  }
+
+  function drawWhale(l) {
+    const t = l.t;
+    const vis = t < 1.2 ? t / 1.2 : t < 4.6 ? 1 : Math.max(0, 1 - (t - 4.6) / 0.9);
+    ctx.save();
+    ctx.translate(l.x, l.y);
+    ctx.rotate(l.a);
+    ctx.scale(1.3, 1.3);
+    if (vis > 0) {
+      ctx.fillStyle = 'rgba(255,255,255,' + 0.16 * vis + ')';
+      ctx.beginPath(); ctx.ellipse(-4, 0, 66, 21, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'rgba(30,46,58,' + 0.85 * vis + ')';
+      ctx.beginPath();
+      ctx.moveTo(55, 0);
+      ctx.bezierCurveTo(55, -16, 10, -17, -25, -11);
+      ctx.quadraticCurveTo(-55, -5, -68, 0);
+      ctx.quadraticCurveTo(-55, 5, -25, 11);
+      ctx.bezierCurveTo(10, 17, 55, 16, 55, 0);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,' + 0.12 * vis + ')';
+      ctx.beginPath(); ctx.ellipse(12, -5, 28, 3.5, 0, 0, Math.PI * 2); ctx.fill();
+    }
+    if (t > 4.7 && t < 6.6) {
+      const k = (t - 4.7) / 1.9, al = Math.sin(Math.PI * k);
+      ctx.translate(-62 - k * 8, 0);
+      ctx.fillStyle = 'rgba(255,255,255,' + 0.3 * al + ')';
+      ctx.beginPath(); ctx.ellipse(0, 0, 14, 10, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'rgba(30,46,58,' + 0.9 * al + ')';
+      for (const sgn of [-1, 1]) {
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.quadraticCurveTo(-4, sgn * 14, -16, sgn * 24);
+        ctx.quadraticCurveTo(-8, sgn * 10, -10, 0);
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+    ctx.restore();
+    if (t > 1.3 && t < 4.0) {
+      const k = (t - 1.3) / 2.7;
+      const hx = l.x + Math.cos(l.a) * 44, hy = l.y + Math.sin(l.a) * 44;
+      const rise = Math.min(1, k * 3), fade = k < 0.45 ? 1 : 1 - (k - 0.45) / 0.55;
+      const H = 85 * rise, W = 10 + 26 * k;
+      const g = ctx.createLinearGradient(hx, hy, hx, hy - H - W);
+      g.addColorStop(0, 'rgba(255,255,255,' + 0.85 * fade + ')');
+      g.addColorStop(1, 'rgba(255,255,255,' + 0.25 * fade + ')');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.moveTo(hx - 3, hy);
+      ctx.quadraticCurveTo(hx - W, hy - H * 0.7, hx - W * 0.8, hy - H);
+      ctx.quadraticCurveTo(hx, hy - H - W, hx + W * 0.8, hy - H);
+      ctx.quadraticCurveTo(hx + W, hy - H * 0.7, hx + 3, hy);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,' + 0.9 * fade + ')';
+      for (let i = 0; i < 14; i++) {
+        const side = i % 2 ? 1 : -1, spread = 0.4 + 0.6 * ((i * 37) % 10) / 10;
+        const ang = -Math.PI / 2 + side * (0.35 + 1.0 * spread), dist = W * 0.7 + 8 + 26 * k * spread;
+        const fall = Math.max(0, k - 0.3) * 90 * spread;
+        circle(hx + Math.cos(ang) * dist, hy - H * 0.85 + Math.sin(ang) * dist + fall, 1.6 + spread); ctx.fill();
+      }
+      ctx.fillStyle = 'rgba(255,255,255,' + 0.35 * fade + ')';
+      ctx.beginPath(); ctx.ellipse(hx, hy, 12 + 20 * k, 6 + 8 * k, 0, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+
+  function drawDolphins(l) {
+    const ca = Math.cos(l.a), sa = Math.sin(l.a);
+    for (let i = 0; i < l.n; i++) {
+      const lat = (i - (l.n - 1) / 2) * 18;
+      for (let k = 0; k < 2; k++) {
+        const st = i * 0.35 + k * 1.6, p = (l.t - st) / 1.0;
+        if (p < -0.3 || p > 1.3) continue;
+        const base = k * 200 - i * 18;
+        for (const pe of [0, 1]) {
+          const d = Math.abs(p - pe);
+          if (d < 0.3) {
+            const al = base + pe * 140;
+            ctx.strokeStyle = 'rgba(255,255,255,' + (1 - d / 0.3) * 0.6 + ')';
+            ctx.lineWidth = 2;
+            circle(l.x + ca * al - sa * lat, l.y + sa * al + ca * lat, 4 + d * 40); ctx.stroke();
+          }
+        }
+        if (p < 0 || p > 1) continue;
+        const al = base + p * 140;
+        const x = l.x + ca * al - sa * lat, y = l.y + sa * al + ca * lat;
+        const h = Math.sin(Math.PI * p) * 45, sc = 1 + h / 140;
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(l.a);
+        ctx.fillStyle = 'rgba(0,0,0,0.18)';
+        ctx.beginPath(); ctx.ellipse(0, 0, 15, 5, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+        ctx.save();
+        ctx.translate(x, y - h);
+        ctx.rotate(l.a);
+        ctx.scale(sc * 1.25, sc * 1.25);
+        ctx.fillStyle = '#6a8594';
+        ctx.beginPath();
+        ctx.moveTo(22, 0);
+        ctx.quadraticCurveTo(16, -2.5, 12, -3);
+        ctx.bezierCurveTo(4, -7, -10, -6, -15, -1.5);
+        ctx.lineTo(-22, -6);
+        ctx.lineTo(-19, 0);
+        ctx.lineTo(-22, 6);
+        ctx.lineTo(-15, 1.5);
+        ctx.bezierCurveTo(-10, 6, 4, 7, 12, 3);
+        ctx.quadraticCurveTo(16, 2.5, 22, 0);
+        ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,0.18)';
+        ctx.beginPath(); ctx.ellipse(2, -2, 9, 1.6, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      }
+    }
+  }
+
+  /* ---------- Desenho ---------- */
+  function circle(x, y, r) { ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); }
+
+  function drawSea(v) {
+    const g = ctx.createLinearGradient(0, 0, 0, ch);
+    g.addColorStop(0, '#0b3c57');
+    g.addColorStop(1, '#13668a');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, cw, ch);
+    ctx.setTransform(dpr * v.sc, 0, 0, dpr * v.sc, dpr * v.ox, dpr * v.oy);
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    const tt = RM ? 0 : time;
+    for (const w of waves) {
+      const off = Math.sin(tt * 0.8 + w.ph) * 12;
+      ctx.beginPath();
+      ctx.moveTo(w.x + off, w.y);
+      ctx.quadraticCurveTo(w.x + off + w.len / 2, w.y - 7, w.x + off + w.len, w.y);
+      ctx.stroke();
+    }
+    for (const l of life) { if (l.type === 'whale') drawWhale(l); else drawDolphins(l); }
+  }
+
+  function drawLand() {
+    // falésia (basalto) e espuma
+    ctx.save();
+    ctx.translate(0, 18);
+    ctx.strokeStyle = 'rgba(255,255,255,' + (0.28 + 0.08 * Math.sin(time * 1.4)) + ')';
+    ctx.lineWidth = 16;
+    ctx.stroke(landPath);
+    ctx.fillStyle = '#3b2f29';
+    ctx.fill(landPath);
+    ctx.restore();
+    ctx.fillStyle = '#4a3b33';
+    ctx.save(); ctx.translate(0, 8); ctx.fill(landPath); ctx.restore();
+    for (const [x, y, r] of rocks) {
+      ctx.fillStyle = '#2f2622'; circle(x, y + 4, r); ctx.fill();
+      ctx.fillStyle = '#4a3c35'; circle(x - 2, y, r * 0.85); ctx.fill();
+    }
+    // relva
+    ctx.fillStyle = '#5f8c3e';
+    ctx.fill(landPath);
+    ctx.fillStyle = '#557f37';
+    for (const p of tufts) { circle(p.x, p.y, p.r); ctx.fill(); }
+    // fairway
+    ctx.fillStyle = '#7db04a';
+    ctx.fill(fairwayPath);
+    ctx.save();
+    ctx.clip(fairwayPath);
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    for (let y = 440; y < 1220; y += 70) ctx.fillRect(300, y, 320, 35);
+    ctx.restore();
+    // green
+    ctx.fillStyle = '#8dc457';
+    ctx.fill(fringePath);
+    ctx.fillStyle = '#a5d66c';
+    ctx.fill(greenPath);
+    ctx.save();
+    ctx.clip(greenPath);
+    ctx.fillStyle = 'rgba(255,255,255,0.07)';
+    for (let x = 280; x < 620; x += 44) ctx.fillRect(x, 200, 22, 240);
+    ctx.restore();
+    // tee
+    ctx.fillStyle = '#8fc35a';
+    ctx.fillRect(TEE.x - 34, TEE.y - 20, 68, 40);
+    ctx.fillStyle = '#ffffff';
+    circle(TEE.x - 26, TEE.y - 12, 4); ctx.fill();
+    circle(TEE.x + 26, TEE.y - 12, 4); ctx.fill();
+  }
+
+  function drawHole() {
+    ctx.fillStyle = '#1d2a1f';
+    circle(HOLE.x, HOLE.y, holeR); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    if (state !== 'sinking' && state !== 'won' && !(state === 'card' && cardWon)) {
+      const top = HOLE.y - 78, wv = Math.sin(time * 4) * 3;
+      ctx.strokeStyle = '#f5f5f5';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.moveTo(HOLE.x, HOLE.y); ctx.lineTo(HOLE.x, top); ctx.stroke();
+      ctx.fillStyle = '#d1352b';
+      ctx.beginPath();
+      ctx.moveTo(HOLE.x, top);
+      ctx.quadraticCurveTo(HOLE.x + 16, top + 4 + wv, HOLE.x + 32, top + 9 + wv);
+      ctx.lineTo(HOLE.x, top + 19);
+      ctx.closePath();
+      ctx.fill();
+    }
+  }
+
+  function drawLighthouse() {
+    const x = LH.x, y = LH.y;
+    // casa do faroleiro
+    ctx.fillStyle = 'rgba(0,0,0,0.22)';
+    ctx.fillRect(612, 236, 56, 10);
+    ctx.fillStyle = '#f3f1ec';
+    ctx.fillRect(616, 212, 48, 28);
+    ctx.fillStyle = '#b8462f';
+    ctx.beginPath(); ctx.moveTo(611, 213); ctx.lineTo(669, 213); ctx.lineTo(659, 197); ctx.lineTo(621, 197); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = night > 0.2 ? 'rgba(255,211,110,' + night + ')' : '#46545b';
+    ctx.fillRect(628, 222, 9, 9);
+    ctx.fillRect(645, 222, 9, 9);
+    // torre
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    ctx.beginPath(); ctx.ellipse(x + 16, y + 3, 28, 9, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#f6f4ef';
+    ctx.beginPath(); ctx.moveTo(x - 17, y); ctx.lineTo(x + 17, y); ctx.lineTo(x + 12, y - 92); ctx.lineTo(x - 12, y - 92); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgba(0,0,0,0.09)';
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 17, y); ctx.lineTo(x + 12, y - 92); ctx.lineTo(x, y - 92); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#8a2a22';
+    ctx.fillRect(x - 4, y - 15, 8, 15);
+    ctx.fillStyle = '#2f2f2f';
+    ctx.fillRect(x - 17, y - 97, 34, 5);
+    // lanterna
+    if (night > 0) {
+      const gl = ctx.createRadialGradient(LAMP.x, LAMP.y, 2, LAMP.x, LAMP.y, 24);
+      gl.addColorStop(0, '#fff6d6');
+      gl.addColorStop(1, '#ffd36e');
+      ctx.fillStyle = gl;
+    } else {
+      ctx.fillStyle = '#3b4a52';
+    }
+    ctx.fillRect(x - 10, y - 115, 20, 18);
+    ctx.strokeStyle = '#2f2f2f'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(x - 3, y - 115); ctx.lineTo(x - 3, y - 97); ctx.moveTo(x + 4, y - 115); ctx.lineTo(x + 4, y - 97); ctx.stroke();
+    ctx.fillStyle = '#c8322b';
+    ctx.beginPath(); ctx.arc(x, y - 115, 11, Math.PI, 0); ctx.fill();
+    ctx.fillRect(x - 1.5, y - 132, 3, 7);
+  }
+
+  function drawBall(v) {
+    const r = Math.max(7, 4.5 / v.sc) * ball.scale;
+    if (r <= 0.2) return;
+    if (state === 'ready') {
+      const pr = r * (2.3 + 0.4 * Math.sin(time * 4));
+      ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+      ctx.lineWidth = Math.max(1.5, 1.5 / v.sc);
+      circle(ball.x, ball.y, pr); ctx.stroke();
+    }
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.beginPath(); ctx.ellipse(ball.x + ball.z * 0.35, ball.y + 2, r * 1.1, r * 0.6, 0, 0, Math.PI * 2); ctx.fill();
+    const rr = r * (1 + ball.z / 300);
+    ctx.fillStyle = '#ffffff';
+    circle(ball.x, ball.y - ball.z, rr); ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+    ctx.lineWidth = rr * 0.2;
+    ctx.stroke();
+  }
+
+  function drawAim(v) {
+    if (state !== 'aiming' || !aim) return;
+    const a = aimInfo();
+    if (!a) return;
+    const col = 'rgb(255,' + Math.round(255 - 120 * a.p) + ',' + Math.round(255 - 200 * a.p) + ')';
+    const lw = Math.max(2, 2.5 / v.sc);
+    ctx.lineWidth = lw;
+    ctx.strokeStyle = col;
+    ctx.setLineDash([lw * 2.5, lw * 2.5]);
+    let ex, ey;
+    if (mode === 'drive') {
+      const carry = a.p * MAX_CARRY;
+      ex = ball.x + a.x * carry; ey = ball.y + a.y * carry;
+    } else {
+      const len = 30 + a.p * 170;
+      ex = ball.x + a.x * len; ey = ball.y + a.y * len;
+    }
+    ctx.beginPath(); ctx.moveTo(ball.x, ball.y); ctx.lineTo(ex, ey); ctx.stroke();
+    ctx.setLineDash([]);
+    if (mode === 'drive') {
+      circle(ex, ey, Math.max(16, 9 / v.sc)); ctx.stroke();
+    } else {
+      const ang = Math.atan2(a.y, a.x), hs = Math.max(12, 8 / v.sc);
+      ctx.fillStyle = col;
+      ctx.beginPath();
+      ctx.moveTo(ex + Math.cos(ang) * hs, ey + Math.sin(ang) * hs);
+      ctx.lineTo(ex + Math.cos(ang + 2.5) * hs, ey + Math.sin(ang + 2.5) * hs);
+      ctx.lineTo(ex + Math.cos(ang - 2.5) * hs, ey + Math.sin(ang - 2.5) * hs);
+      ctx.closePath(); ctx.fill();
+    }
+    // corda da "fisga"
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+    ctx.beginPath();
+    ctx.moveTo(ball.x, ball.y);
+    ctx.lineTo(ball.x - a.x * a.p * 60, ball.y - a.y * a.p * 60);
+    ctx.stroke();
+  }
+
+  function drawFx() {
+    for (const f of fx) {
+      for (let i = 0; i < 3; i++) {
+        const k = Math.max(0, f.t - i * 0.15);
+        ctx.strokeStyle = 'rgba(255,255,255,' + (1 - k) * 0.8 + ')';
+        ctx.lineWidth = 3;
+        circle(f.x, f.y, 8 + k * 55); ctx.stroke();
+      }
+    }
+  }
+
+  function drawNight(v) {
+    if (night <= 0) return;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = 'rgba(6,18,36,' + 0.62 * night + ')';
+    ctx.fillRect(0, 0, cw, ch);
+    ctx.setTransform(dpr * v.sc, 0, 0, dpr * v.sc, dpr * v.ox, dpr * v.oy);
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    const R = 1700, w = 0.13;
+    for (const off of [0, Math.PI]) {
+      const a = beamAng + off;
+      const g = ctx.createLinearGradient(LAMP.x, LAMP.y, LAMP.x + Math.cos(a) * R, LAMP.y + Math.sin(a) * R);
+      g.addColorStop(0, 'rgba(255,226,150,' + 0.55 * night + ')');
+      g.addColorStop(0.5, 'rgba(255,226,150,' + 0.12 * night + ')');
+      g.addColorStop(1, 'rgba(255,226,150,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.moveTo(LAMP.x, LAMP.y);
+      ctx.lineTo(LAMP.x + Math.cos(a - w) * R, LAMP.y + Math.sin(a - w) * R);
+      ctx.lineTo(LAMP.x + Math.cos(a + w) * R, LAMP.y + Math.sin(a + w) * R);
+      ctx.closePath();
+      ctx.fill();
+    }
+    const glow = ctx.createRadialGradient(LAMP.x, LAMP.y, 0, LAMP.x, LAMP.y, 90);
+    glow.addColorStop(0, 'rgba(255,230,160,' + 0.9 * night + ')');
+    glow.addColorStop(1, 'rgba(255,230,160,0)');
+    ctx.fillStyle = glow;
+    circle(LAMP.x, LAMP.y, 90); ctx.fill();
+    ctx.restore();
+  }
+
+  function draw() {
+    const v = view();
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    drawSea(v);
+    drawLand();
+    drawHole();
+    drawFx();
+    if (ball.y < LH.y) { drawBall(v); drawLighthouse(); }
+    else { drawLighthouse(); drawBall(v); }
+    drawAim(v);
+    drawNight(v);
+  }
+
+  let prev = performance.now();
+  function frame(now) {
+    const dt = Math.min(0.033, (now - prev) / 1000);
+    prev = now;
+    update(dt);
+    draw();
+    requestAnimationFrame(frame);
+  }
+
+  newWind();
+  applyLang();
+  requestAnimationFrame(frame);
+})();
+</script>
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "8968e967ed484742875d0e698203bdea"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>
