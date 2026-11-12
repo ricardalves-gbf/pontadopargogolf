@@ -287,7 +287,7 @@
     </ul>
     <p id="cardOffers"></p>
     <a class="btn btn-primary" id="mailBtn" href="#"></a>
-    <p class="small"><span id="orWrite"></span> <a id="mailText" href="#"></a></p>
+    <p class="small" id="copied" role="status" aria-live="polite" hidden></p>
     <button type="button" class="btn btn-ghost" id="cardAction"></button>
   </div>
 </div>
@@ -336,7 +336,8 @@
       offers: 'Aceitam-se propostas.',
       mainTag: 'principal',
       send: 'Enviar proposta por email',
-      orWrite: 'Ou escreva para',
+      copied: 'Endereço copiado:',
+      writeTo: 'Escreva para:',
       replay: 'Jogar outra vez',
       back: 'Voltar ao jogo',
       score: (name, n) => n === 1 ? name + '!' : name + ' com ' + n + ' tacadas',
@@ -382,7 +383,8 @@
       offers: 'Offers welcome.',
       mainTag: 'main',
       send: 'Send an offer by email',
-      orWrite: 'Or write to',
+      copied: 'Address copied:',
+      writeTo: 'Write to:',
       replay: 'Play again',
       back: 'Back to the game',
       score: (name, n) => n === 1 ? name + '!' : name + ' in ' + n + ' strokes',
@@ -552,9 +554,7 @@
     const href = 'mailto:' + EMAIL + '?subject=' + encodeURIComponent(tt.subject) + '&body=' + encodeURIComponent(tt.body);
     $('mailBtn').textContent = tt.send;
     $('mailBtn').href = href;
-    $('orWrite').textContent = tt.orWrite;
-    $('mailText').textContent = EMAIL;
-    $('mailText').href = href;
+    $('copied').hidden = true;
     $('cardAction').textContent = cardWon ? tt.replay : tt.back;
   }
   let prevState = 'ready';
@@ -578,6 +578,33 @@
     else state = prevState === 'aiming' ? 'ready' : prevState;
   }
   $('skipBtn').addEventListener('click', () => { if (state !== 'card') openCard(false); });
+  function showCopied(ok) {
+    const el = $('copied');
+    el.textContent = (ok ? t().copied : t().writeTo) + ' ' + EMAIL;
+    el.hidden = false;
+  }
+  function copyEmail() {
+    const fallback = () => {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = EMAIL;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        showCopied(ok);
+      } catch (e) { showCopied(false); }
+    };
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(EMAIL).then(() => showCopied(true), fallback);
+    } else {
+      fallback();
+    }
+  }
+  $('mailBtn').addEventListener('click', copyEmail);
   $('cardAction').addEventListener('click', closeCard);
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && state === 'card') closeCard(); });
 
