@@ -817,7 +817,9 @@
     if (state !== 'ready') return;
     hideHint();
     canvas.setPointerCapture(e.pointerId);
-    aim = { sx: e.clientX, sy: e.clientY, cx: e.clientX, cy: e.clientY };
+    // a força máxima ajusta-se ao espaço disponível abaixo do ponto onde se carrega
+    const room = ch - e.clientY - 14;
+    aim = { sx: e.clientX, sy: e.clientY, cx: e.clientX, cy: e.clientY, max: Math.max(60, Math.min(maxDrag(), room)) };
     state = 'aiming';
   });
   canvas.addEventListener('pointermove', e => {
@@ -826,7 +828,7 @@
   function aimInfo() {
     const dx = aim.sx - aim.cx, dy = aim.sy - aim.cy, len = Math.hypot(dx, dy);
     if (len < 1) return null;
-    return { x: dx / len, y: dy / len, p: Math.min(len / maxDrag(), 1) };
+    return { x: dx / len, y: dy / len, p: Math.min(len / (aim.max || maxDrag()), 1) };
   }
   canvas.addEventListener('pointerup', () => {
     if (state !== 'aiming') return;
