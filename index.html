@@ -250,6 +250,8 @@
   html[lang="pt"] .l-en, html[lang="en"] .l-pt { display: none; }
   .about h2 { font-size: 1.6rem; }
   .about p { color: var(--ink-soft); }
+  .about .note { font-size: 0.88rem; border-top: 1px solid rgba(251, 248, 242, 0.12); padding-top: 12px; margin-bottom: 16px; }
+  .intro-skip { display: block; margin: 10px auto 0; }
   @media (max-width: 420px) {
     .overlay { align-items: flex-end; }
     .card h2 { font-size: 1.7rem; }
@@ -283,6 +285,25 @@
   <div class="links">
     <button type="button" class="skip" id="aboutBtn"></button>
     <button type="button" class="skip" id="skipBtn"></button>
+  </div>
+</div>
+
+<div class="overlay" id="intro" hidden>
+  <div class="card about" role="dialog" aria-modal="true" aria-labelledby="introTitlePt">
+    <div class="l-pt" lang="pt">
+      <h2 id="introTitlePt">Bem-vindo ao mini-golfe da Ponta do Pargo</h2>
+      <p>Um pequeno jogo online, inspirado no farol e nas falésias do ponto mais a oeste da Madeira.</p>
+      <p>Ponha a bola no buraco e o farol acende-se para revelar os domínios à venda.</p>
+      <p class="note">Site independente. Este mini-golfe existe só aqui, no ecrã, e não tem ligação ao campo de golfe em construção na Ponta do Pargo.</p>
+    </div>
+    <div class="l-en" lang="en">
+      <h2>Welcome to the Ponta do Pargo mini-golf</h2>
+      <p>A small online game inspired by the lighthouse and cliffs at Madeira’s westernmost point.</p>
+      <p>Sink the ball and the lighthouse lights up to reveal the domains for sale.</p>
+      <p class="note">Independent website. This mini-golf exists only here, on your screen, and has no connection to the golf course being built at Ponta do Pargo.</p>
+    </div>
+    <button type="button" class="btn btn-primary" id="introPlay"></button>
+    <button type="button" class="skip intro-skip" id="introSkip"></button>
   </div>
 </div>
 
@@ -362,6 +383,8 @@
       help: 'O vento acalmou e o buraco cresceu um bocadinho. Força!',
       skip: 'Ver os domínios à venda sem jogar',
       about: 'Sobre este site',
+      play: 'Jogar',
+      introSkip: 'Ver os domínios sem jogar',
       close: 'Fechar',
       winTitle: 'O farol acendeu-se!',
       skipTitle: 'Domínios à venda',
@@ -411,6 +434,8 @@
       help: 'The wind has dropped and the hole got a little bigger. Go for it!',
       skip: 'See the domains for sale without playing',
       about: 'About this site',
+      play: 'Play',
+      introSkip: 'See the domains without playing',
       close: 'Close',
       winTitle: 'The lighthouse is lit!',
       skipTitle: 'Domains for sale',
@@ -566,6 +591,8 @@
     $('skipBtn').textContent = t().skip;
     $('aboutBtn').textContent = t().about;
     $('aboutClose').textContent = t().close;
+    $('introPlay').textContent = t().play;
+    $('introSkip').textContent = t().introSkip;
   }
   function applyLang() {
     document.documentElement.lang = lang;
@@ -638,6 +665,30 @@
     state = aboutPrev;
   }
   $('aboutBtn').addEventListener('click', openAbout);
+
+  /* Nota de boas-vindas: só na primeira visita */
+  let introSeen = false;
+  try { introSeen = localStorage.getItem('ppg-intro-seen') === '1'; } catch (e) { /* sem armazenamento */ }
+  function openIntro() {
+    state = 'card';
+    document.body.classList.add('ended');
+    const o = $('intro');
+    o.hidden = false;
+    requestAnimationFrame(() => o.classList.add('show'));
+    setTimeout(() => $('introPlay').focus({ preventScroll: true }), 50);
+  }
+  function closeIntro() {
+    const o = $('intro');
+    if (o.hidden) return;
+    o.classList.remove('show');
+    setTimeout(() => { o.hidden = true; }, 300);
+    document.body.classList.remove('ended');
+    state = 'ready';
+    try { localStorage.setItem('ppg-intro-seen', '1'); } catch (e) { /* sem armazenamento */ }
+  }
+  $('introPlay').addEventListener('click', closeIntro);
+  $('intro').addEventListener('click', e => { if (e.target.id === 'intro') closeIntro(); });
+  $('introSkip').addEventListener('click', () => { closeIntro(); openCard(false); });
   $('aboutClose').addEventListener('click', closeAbout);
   $('about').addEventListener('click', e => { if (e.target.id === 'about') closeAbout(); });
   function showCopied(ok) {
@@ -670,7 +721,9 @@
   $('cardAction').addEventListener('click', closeCard);
   document.addEventListener('keydown', e => {
     if (e.key !== 'Escape' || state !== 'card') return;
-    if (!$('about').hidden) closeAbout(); else closeCard();
+    if (!$('intro').hidden) closeIntro();
+    else if (!$('about').hidden) closeAbout();
+    else closeCard();
   });
 
   function resetGame() {
@@ -678,6 +731,7 @@
     last = { x: TEE.x, y: TEE.y };
     vel = { x: 0, y: 0 };
     strokes = 0; splashes = 0; help = false; holeR = 10;
+    cardWon = false;
     mode = 'drive'; state = 'ready'; night = 0; fx = [];
     camTarget = VIEW_ALL;
     newWind();
@@ -902,7 +956,9 @@
       if (sinkT >= 1) win();
     }
 
-    if (state === 'won' || (state === 'card' && cardWon)) night = Math.min(1, night + dt / 1.6);
+    const ended = state === 'won' || (state === 'card' && cardWon && !$('overlay').hidden);
+    if (ended) night = Math.min(1, night + dt / 1.6);
+    else if (night > 0 && state !== 'card') night = Math.max(0, night - dt / 0.8);
     if (night > 0) beamAng += dt * (RM ? 0.35 : 1.1);
     fx.forEach(f => { f.t += dt / 1.2; });
     fx = fx.filter(f => f.t < 1);
@@ -1321,6 +1377,7 @@
 
   newWind();
   applyLang();
+  if (!introSeen) openIntro();
   requestAnimationFrame(frame);
 })();
 </script>
