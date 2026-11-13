@@ -572,11 +572,11 @@
 
   const cam = { ...VIEW_ALL };
   let camTarget = VIEW_ALL;
-  function view() {
+  function view(c = cam) {
     const padT = 78, padB = 56;
     const ah = Math.max(100, ch - padT - padB);
-    const sc = Math.min(cw / cam.w, ah / cam.h);
-    return { sc, ox: (cw - cam.w * sc) / 2 - cam.x * sc, oy: padT + (ah - cam.h * sc) / 2 - cam.y * sc };
+    const sc = Math.min(cw / c.w, ah / c.h);
+    return { sc, ox: (cw - c.w * sc) / 2 - c.x * sc, oy: padT + (ah - c.h * sc) / 2 - c.y * sc };
   }
 
   /* ---------- Estado do jogo ---------- */
@@ -592,7 +592,7 @@
   let night = 0, beamAng = -0.6;
   let fx = [];
   let time = 0;
-  let lastSplashMsg = -1, bumpedThisShot = false;
+  let lastSplashMsg = -1, bumpedThisShot = false, lipPending = false;
   const lastHit = { house: -1, tower: -1 };
 
   function newWind() {
@@ -635,9 +635,28 @@
       el.append(main);
     }
   }
+  // coloca a mensagem na metade do ecrã oposta à bola (e ao buraco)
+  function placeHint() {
+    const v = view(camTarget);
+    const by = ball.y * v.sc + v.oy;
+    const hy = HOLE.y * v.sc + v.oy;
+    const el = $('hint');
+    const half = el.offsetHeight / 2 + 8;
+    const flagTop = hy - 78 * v.sc;
+    const minY = 90 + half, maxY = ch - 70 - half;
+    const top = Math.min(by, flagTop) - 50, bottom = Math.max(by, hy) + 50;
+    const spaceAbove = top - 90, spaceBelow = ch - 70 - bottom;
+    const y = hintKind === 'drive'
+      ? Math.min(ch * 0.5, by - 50 - half)
+      : spaceAbove >= spaceBelow
+      ? Math.min(ch * 0.3, top - half)
+      : Math.max(ch * 0.7, bottom + half);
+    el.style.top = Math.round(Math.max(minY, Math.min(maxY, y))) + 'px';
+  }
   function showHint(kind, ms = 4500) {
     hintKind = kind;
     renderHint();
+    placeHint();
     $('hint').classList.add('show');
     clearTimeout(hintTimer);
     hintTimer = setTimeout(hideHint, ms);
@@ -844,6 +863,7 @@
     last = { x: ball.x, y: ball.y };
     ball.lipped = false;
     bumpedThisShot = false;
+    lipPending = false;
     if (mode === 'drive') {
       const carry = a.p * MAX_CARRY;
       const drift = wind.s * WIND_MAX * (carry / MAX_CARRY);
@@ -893,19 +913,23 @@
   }
 
   function settle(fromSplash) {
+    if (lipPending && !fromSplash) toast(t().lip, 2200);
+    lipPending = false;
     const s = surface(ball.x, ball.y);
     const prevMode = mode;
     mode = (s === 'green' || s === 'fringe') ? 'putt' : 'drive';
     last = { x: ball.x, y: ball.y };
     checkHelp();
     if (mode === 'drive') newWind();
-    if (mode === 'putt' && prevMode !== 'putt' && !fromSplash) showHint('green', 4000);
     camTarget = mode === 'putt' ? VIEW_PUTT : VIEW_ALL;
+    if (mode === 'putt' && prevMode !== 'putt' && !fromSplash) showHint('green', 4000);
     state = 'ready';
     updateHUD();
   }
 
   function sink() {
+    lipPending = false;
+    $('toast').classList.remove('show');
     state = 'sinking';
     sinkT = 0;
     vel = { x: 0, y: 0 };
@@ -966,7 +990,7 @@
           ball.lipped = true;
           const ang = (rnd() - 0.5) * 0.7, c = Math.cos(ang), sn = Math.sin(ang);
           vel = { x: (vel.x * c - vel.y * sn) * 0.8, y: (vel.x * sn + vel.y * c) * 0.8 };
-          toast(t().lip, 1800);
+          lipPending = true;
         }
       } else if (d > holeR * 1.6) {
         ball.lipped = false;
