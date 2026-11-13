@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://pontadopargogolf.com/sitemap.xml

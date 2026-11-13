@@ -3,10 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Ponta do Pargo Golf · Domínios à venda</title>
-<meta name="description" content="pontadopargogolf.com, pontadopargogolfcourse.com e pontadopargogolfe.com estão à venda. Acerte no buraco e acenda o farol da Ponta do Pargo.">
-<meta property="og:title" content="Ponta do Pargo Golf">
-<meta property="og:description" content="Três domínios à venda. Acerte no buraco e acenda o farol.">
+<title>Ponta do Pargo Golf: domínios à venda e mini-golfe junto ao farol, Madeira</title>
+<meta name="description" content="pontadopargogolf.com, pontadopargogolfcourse.com e pontadopargogolfe.com estão à venda. Jogue um mini-golfe junto ao farol da Ponta do Pargo, na Madeira. Site independente.">
+<link rel="canonical" href="https://pontadopargogolf.com/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://pontadopargogolf.com/">
+<meta property="og:title" content="Ponta do Pargo Golf: domínios à venda">
+<meta property="og:description" content="Acerte no buraco, acenda o farol da Ponta do Pargo e descubra os três domínios à venda.">
 <meta name="theme-color" content="#0e4a66">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛳</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -242,6 +245,11 @@
     outline-offset: 2px;
   }
   body.ended .hud-bottom { visibility: hidden; }
+  .links { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 18px; margin-top: 8px; }
+  .links .skip { margin-top: 0; }
+  html[lang="pt"] .l-en, html[lang="en"] .l-pt { display: none; }
+  .about h2 { font-size: 1.6rem; }
+  .about p { color: var(--ink-soft); }
   @media (max-width: 420px) {
     .overlay { align-items: flex-end; }
     .card h2 { font-size: 1.7rem; }
@@ -272,7 +280,30 @@
 
 <div class="hud hud-bottom">
   <div class="panel hint" id="hint"></div>
-  <button type="button" class="skip" id="skipBtn"></button>
+  <div class="links">
+    <button type="button" class="skip" id="aboutBtn"></button>
+    <button type="button" class="skip" id="skipBtn"></button>
+  </div>
+</div>
+
+<div class="overlay" id="about" hidden>
+  <div class="card about" role="dialog" aria-modal="true" aria-labelledby="aboutTitlePt">
+    <div class="l-pt" lang="pt">
+      <h2 id="aboutTitlePt">Sobre este site</h2>
+      <p>A Ponta do Pargo, no concelho da Calheta, é o ponto mais a oeste da ilha da Madeira, com falésias altas sobre o Atlântico e um farol de 1922.</p>
+      <p>É aí que está a ser construído um campo de golfe de 18 buracos, par 72, desenhado por Sir Nick Faldo, com abertura prevista para 2027, segundo a imprensa de golfe.</p>
+      <p>Este site é independente e não tem qualquer ligação ao campo de golfe, aos seus proprietários ou à Faldo Design. O mini-golfe é apenas uma brincadeira inspirada na paisagem.</p>
+      <p>Os domínios pontadopargogolf.com, pontadopargogolfcourse.com e pontadopargogolfe.com estão à venda, em conjunto. Aceitam-se propostas.</p>
+    </div>
+    <div class="l-en" lang="en">
+      <h2>About this site</h2>
+      <p>Ponta do Pargo, in the municipality of Calheta, is the westernmost point of Madeira island, with high cliffs above the Atlantic and a lighthouse dating from 1922.</p>
+      <p>An 18-hole, par-72 golf course designed by Sir Nick Faldo is being built there, with opening expected in 2027, according to the golf press.</p>
+      <p>This is an independent website with no connection to the golf course, its owners or Faldo Design. The mini-golf game is just for fun, inspired by the landscape.</p>
+      <p>The domains pontadopargogolf.com, pontadopargogolfcourse.com and pontadopargogolfe.com are for sale as a bundle. Offers welcome.</p>
+    </div>
+    <button type="button" class="btn btn-ghost" id="aboutClose"></button>
+  </div>
 </div>
 
 <div class="overlay" id="overlay" hidden>
@@ -330,6 +361,8 @@
       lip: 'Quase! A bola deu a volta ao buraco.',
       help: 'O vento acalmou e o buraco cresceu um bocadinho. Força!',
       skip: 'Ver os domínios à venda sem jogar',
+      about: 'Sobre este site',
+      close: 'Fechar',
       winTitle: 'O farol acendeu-se!',
       skipTitle: 'Domínios à venda',
       forSale: 'Estes três domínios estão à venda, em conjunto:',
@@ -377,6 +410,8 @@
       lip: 'So close! The ball lipped out.',
       help: 'The wind has dropped and the hole got a little bigger. Go for it!',
       skip: 'See the domains for sale without playing',
+      about: 'About this site',
+      close: 'Close',
       winTitle: 'The lighthouse is lit!',
       skipTitle: 'Domains for sale',
       forSale: 'These three domains are for sale as a bundle:',
@@ -529,6 +564,8 @@
     $('windArrow').style.transform = 'rotate(' + (wind.a * 180 / Math.PI) + 'deg)';
     $('windArrow').style.opacity = wind.s > 0 ? 1 : 0.3;
     $('skipBtn').textContent = t().skip;
+    $('aboutBtn').textContent = t().about;
+    $('aboutClose').textContent = t().close;
   }
   function applyLang() {
     document.documentElement.lang = lang;
@@ -578,6 +615,27 @@
     else state = prevState === 'aiming' ? 'ready' : prevState;
   }
   $('skipBtn').addEventListener('click', () => { if (state !== 'card') openCard(false); });
+  let aboutPrev = 'ready';
+  function openAbout() {
+    if (state === 'card') return;
+    aboutPrev = state === 'aiming' ? 'ready' : state;
+    state = 'card';
+    const o = $('about');
+    document.body.classList.add('ended');
+    o.hidden = false;
+    requestAnimationFrame(() => o.classList.add('show'));
+    setTimeout(() => $('aboutClose').focus({ preventScroll: true }), 50);
+  }
+  function closeAbout() {
+    const o = $('about');
+    o.classList.remove('show');
+    setTimeout(() => { o.hidden = true; }, 300);
+    document.body.classList.remove('ended');
+    state = aboutPrev;
+  }
+  $('aboutBtn').addEventListener('click', openAbout);
+  $('aboutClose').addEventListener('click', closeAbout);
+  $('about').addEventListener('click', e => { if (e.target.id === 'about') closeAbout(); });
   function showCopied(ok) {
     const el = $('copied');
     el.textContent = (ok ? t().copied : t().writeTo) + ' ' + EMAIL;
@@ -606,7 +664,10 @@
   }
   $('mailBtn').addEventListener('click', copyEmail);
   $('cardAction').addEventListener('click', closeCard);
-  document.addEventListener('keydown', e => { if (e.key === 'Escape' && state === 'card') closeCard(); });
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape' || state !== 'card') return;
+    if (!$('about').hidden) closeAbout(); else closeCard();
+  });
 
   function resetGame() {
     Object.assign(ball, { x: TEE.x, y: TEE.y, z: 0, lipped: false, scale: 1 });
