@@ -594,8 +594,9 @@
     $('copied').hidden = true;
     $('cardAction').textContent = cardWon ? tt.replay : tt.back;
   }
-  let prevState = 'ready';
+  let prevState = 'ready', cardTimer = 0;
   function openCard(won) {
+    clearTimeout(cardTimer);
     cardWon = won;
     fillCard();
     if (!won) prevState = state;
@@ -609,15 +610,17 @@
   function closeCard() {
     const o = $('overlay');
     o.classList.remove('show');
-    setTimeout(() => { o.hidden = true; }, 300);
+    clearTimeout(cardTimer);
+    cardTimer = setTimeout(() => { o.hidden = true; }, 300);
     document.body.classList.remove('ended');
     if (cardWon) resetGame();
     else state = prevState === 'aiming' ? 'ready' : prevState;
   }
   $('skipBtn').addEventListener('click', () => { if (state !== 'card') openCard(false); });
-  let aboutPrev = 'ready';
+  let aboutPrev = 'ready', aboutTimer = 0;
   function openAbout() {
     if (state === 'card') return;
+    clearTimeout(aboutTimer);
     aboutPrev = state === 'aiming' ? 'ready' : state;
     state = 'card';
     const o = $('about');
@@ -629,7 +632,8 @@
   function closeAbout() {
     const o = $('about');
     o.classList.remove('show');
-    setTimeout(() => { o.hidden = true; }, 300);
+    clearTimeout(aboutTimer);
+    aboutTimer = setTimeout(() => { o.hidden = true; }, 300);
     document.body.classList.remove('ended');
     state = aboutPrev;
   }
