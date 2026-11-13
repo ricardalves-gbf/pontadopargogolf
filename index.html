@@ -56,6 +56,7 @@
   }
   .hud-top {
     top: 0;
+    z-index: 3;
     justify-content: space-between;
     align-items: flex-start;
     padding-top: calc(12px + env(safe-area-inset-top, 0px));
@@ -139,6 +140,24 @@
     padding: 6px;
     text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
   }
+  .hint {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0.96);
+    width: max-content;
+    max-width: min(84vw, 340px);
+    text-align: center;
+    font-size: 1rem;
+    line-height: 1.45;
+    padding: 14px 18px;
+    opacity: 0;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    pointer-events: none !important;
+    z-index: 1;
+  }
+  .hint.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  .hint-sub { margin-top: 6px; font-size: 0.88rem; color: var(--ink-soft); }
   .toast {
     position: fixed;
     left: 50%;
@@ -158,6 +177,7 @@
   .overlay {
     position: fixed;
     inset: 0;
+    z-index: 2;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -280,8 +300,9 @@
 
 <div class="toast panel" id="toast" role="status" aria-live="polite"></div>
 
+<div class="panel hint" id="hint" role="status" aria-live="polite"></div>
+
 <div class="hud hud-bottom">
-  <div class="panel hint" id="hint"></div>
   <div class="links">
     <button type="button" class="skip" id="aboutBtn"></button>
     <button type="button" class="skip" id="skipBtn"></button>
@@ -454,6 +475,10 @@
     }
   };
   let lang = (navigator.language || 'pt').toLowerCase().startsWith('pt') ? 'pt' : 'en';
+  try {
+    const saved = localStorage.getItem('ppg-lang');
+    if (saved === 'pt' || saved === 'en') lang = saved;
+  } catch (e) { /* sem armazenamento */ }
   const t = () => T[lang];
 
   /* ---------- Mundo (unidades lógicas) ---------- */
@@ -533,7 +558,7 @@
   const cam = { ...VIEW_ALL };
   let camTarget = VIEW_ALL;
   function view() {
-    const padT = 78, padB = 110;
+    const padT = 78, padB = 56;
     const ah = Math.max(100, ch - padT - padB);
     const sc = Math.min(cw / cam.w, ah / cam.h);
     return { sc, ox: (cw - cam.w * sc) / 2 - cam.x * sc, oy: padT + (ah - cam.h * sc) / 2 - cam.y * sc };
@@ -579,10 +604,36 @@
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => el.classList.remove('show'), ms);
   }
+  let hintTimer = 0, hintKind = null;
+  function renderHint() {
+    const el = $('hint');
+    el.textContent = '';
+    const main = document.createElement('div');
+    if (hintKind === 'green') {
+      main.textContent = t().onGreen;
+      const sub = document.createElement('div');
+      sub.className = 'hint-sub';
+      sub.textContent = t().hintPutt;
+      el.append(main, sub);
+    } else {
+      main.textContent = hintKind === 'putt' ? t().hintPutt : t().hintDrive;
+      el.append(main);
+    }
+  }
+  function showHint(kind, ms = 4500) {
+    hintKind = kind;
+    renderHint();
+    $('hint').classList.add('show');
+    clearTimeout(hintTimer);
+    hintTimer = setTimeout(hideHint, ms);
+  }
+  function hideHint() {
+    clearTimeout(hintTimer);
+    $('hint').classList.remove('show');
+  }
   function updateHUD() {
     $('strokes').textContent = t().strokes(strokes);
     $('parLabel').textContent = t().par;
-    $('hint').textContent = mode === 'putt' ? t().hintPutt : t().hintDrive;
     const w = $('wind');
     w.hidden = mode === 'putt';
     $('windText').textContent = wind.s > 0 ? t().wind(Math.round(wind.s * 28)) : t().noWind;
@@ -599,8 +650,13 @@
     document.querySelectorAll('.lang button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
     updateHUD();
     if (!$('overlay').hidden) fillCard();
+    if (hintKind) renderHint();
   }
-  document.querySelectorAll('.lang button').forEach(b => b.addEventListener('click', () => { lang = b.dataset.lang; applyLang(); }));
+  document.querySelectorAll('.lang button').forEach(b => b.addEventListener('click', () => {
+    lang = b.dataset.lang;
+    try { localStorage.setItem('ppg-lang', lang); } catch (e) { /* sem armazenamento */ }
+    applyLang();
+  }));
 
   const EMAIL = ['pontadopargogolfmadeira', 'gmail.com'].join('@');
   let cardWon = false;
@@ -684,6 +740,7 @@
     setTimeout(() => { o.hidden = true; }, 300);
     document.body.classList.remove('ended');
     state = 'ready';
+    setTimeout(() => { if (state === 'ready') showHint('drive'); }, 350);
     try { localStorage.setItem('ppg-intro-seen', '1'); } catch (e) { /* sem armazenamento */ }
   }
   $('introPlay').addEventListener('click', closeIntro);
@@ -736,12 +793,14 @@
     camTarget = VIEW_ALL;
     newWind();
     updateHUD();
+    setTimeout(() => { if (state === 'ready') showHint('drive'); }, 400);
   }
 
   /* ---------- Entrada (rato / toque) ---------- */
   const maxDrag = () => Math.max(110, Math.min(190, Math.min(cw, ch) * 0.34));
   canvas.addEventListener('pointerdown', e => {
     if (state !== 'ready') return;
+    hideHint();
     canvas.setPointerCapture(e.pointerId);
     aim = { sx: e.clientX, sy: e.clientY, cx: e.clientX, cy: e.clientY };
     state = 'aiming';
@@ -823,7 +882,7 @@
     last = { x: ball.x, y: ball.y };
     checkHelp();
     if (mode === 'drive') newWind();
-    if (mode === 'putt' && prevMode !== 'putt' && !fromSplash) toast(t().onGreen, 2200);
+    if (mode === 'putt' && prevMode !== 'putt' && !fromSplash) showHint('green', 4000);
     camTarget = mode === 'putt' ? VIEW_PUTT : VIEW_ALL;
     state = 'ready';
     updateHUD();
@@ -1378,6 +1437,7 @@
   newWind();
   applyLang();
   if (!introSeen) openIntro();
+  else setTimeout(() => showHint('drive'), 500);
   requestAnimationFrame(frame);
 })();
 </script>
